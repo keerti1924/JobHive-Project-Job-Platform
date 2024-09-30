@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    
+	<div class="container-fluid">
+            <div class="container py-2 py-lg-4">
+            
+            <!-- Success Message -->
+	        <div th:if="${successMessage}" class="alert alert-success">
+	            <p th:text="${successMessage}"></p>
+	        </div>
+	
+	        <!-- Error Message -->
+	        <div th:if="${errorMessage}" class="alert alert-danger">
+	            <p th:text="${errorMessage}"></p>
+	        </div>
+        
+                <div class="row g-2">
+                    <!-- Left Sidebar for similar jobs -->
+                    <div class="col-lg-4">
+                        <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                            <div class="d-flex justify-content-between">
+                                <h4 class="mb-4">Other jobs for you</h4>
+                                <a href="/jobs" class="text-danger">See all</a>
+                            </div>
+                            <div th:if="${jobs.isEmpty()}">
+                                <p>No jobs available</p>
+                            </div>
+                            <div th:if="${!jobs.isEmpty()}">
+                                <div th:each="job : ${jobs}" class="d-flex align-items-center mb-3">
+                                    <img src="/static/img/company.png" alt="logo" class="img-fluid me-2" width="50px">
+                                    <div class="job " style="line-height: 18px;">
+                                        <a th:href="@{/jobs/details/{id}(id=${job.id})}" class="text-dark">
+                                            <p class="mb-0" th:text="${job.title}"></p>
+                                        </a>
+                                        <small class="mb-0" th:text="${job.company}"></small><br> 
+                                        <small th:text="${timeUtils.formatRelativeTime(job.postedDate)}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="modal fade" id="applyJobModal" tabindex="-1" aria-labelledby="applyJobModalLabel" aria-hidden="true">
+									  <div class="modal-dialog modal-dialog-centered">
+									    <div class="modal-content">
+									      <div class="modal-header">
+									        <h5 class="modal-title" id="applyJobModalLabel">Apply for Job</h5>
+									        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									      </div>
+									      <div class="modal-body">
+									        <!-- Application Form -->
+									        <form id="jobApplicationForm" th:action="@{/jobs/apply}" method="post" enctype="multipart/form-data">
+									          <input type="hidden" name="jobId" id="modalJobId" />
+									          
+									          <div class="mb-3">
+									            <label for="applicantName" class="form-label">Your Name</label>
+									            <input type="text" class="form-control" id="applicantName" name="fullName" th:value="${currentUser.firstName} + ' ' + ${currentUser.lastName}" required>
+									          </div>
+									          
+									          <div class="mb-3">
+									            <label for="applicantEmail" class="form-label">Email Address</label>
+									            <input type="email" class="form-control" id="applicantEmail" name="email" th:value="${currentUser.email}" required>
+									          </div>
+									          
+									          <div class="mb-3">
+									            <label for="phone" class="form-label">Phone Number</label>
+									            <input type="tel" class="form-control" id="phone" name="phone" th:value="${currentUser.phoneNumber}" required>
+									          </div>
+									          
+									          <div class="mb-3">
+									            <label for="resume" class="form-label">Upload Resume</label>
+									            <input type="file" class="form-control" id="resume" name="resume" required>
+									          </div>
+									
+									          <button type="submit" class="btn btn-danger">Submit Application</button>
+									        </form>
+									      </div>
+									    </div>
+									  </div>
+									</div>
+                            
+                                    
+                                </div>
+                            </div>
+                            
+                        
+           
+
+                    <!-- Job details section -->
+                    <div class="col-lg-8">
+                        <div class="card bg-white shadow p-4" style="border-radius: 10px;">
+                            <div class="company">
+                                <img src="/static/img/company.png" alt="Job Image" class="me-1 img-fluid" width="40px">
+                                <small class="text-dark fs-6" th:text="${job.company}"></small>
+                            </div>
+                            <div class="content mt-2">
+                                <h4 th:text="${job.title}" class="mb-1"> </h4>
+                                <small> <i class="fas fa-map-marker-alt me-2 text-danger"></i> <span th:text="${job.location} + ' · ' + ${timeUtils.formatRelativeTime(job.postedDate)}"></span></small><br>
+                                <small> <i class="fa fa-briefcase me-2 text-danger"></i> <span th:text="${job.workplace} + ' · ' + ${job.jobType}"></span></small><br>
+                                <small> <i class="fa fa-list me-2 text-danger"></i> <span th:text="'Skills :- ' + ${job.skills}"></span></small><br>
+                                <button type="button" class="btn btn-danger rounded-pill px-4 py-1 mt-4" th:if="${job.canApply && !job.hasApplied}" data-bs-toggle="modal" data-bs-target="#applyJobModal" 
+            						th:attr="data-job-id=${job.id}" title="Apply">
+								    Apply <i class="fas fa-arrow-right ms-2"></i>
+								</button>
+								<button type="button" class="btn btn-success rounded-pill px-4 py-1 mt-4" 
+							            th:if="${hasApplied}" disabled>
+							        Applied
+							    </button>
+								
+									
+
+                                <div class="mt-5">
+                                    <h5>About the job</h5>
+                                    <small th:utext="${job.description}"></small>
+
+                                    <h5 class="mt-4">Skills</h5>
+                                    <small th:text="${job.skills}"></small>
+
+                                    <div class="hiring mt-4">
+                                        <div class="card px-4 py-3" style="border-radius: 10px;">
+                                            <h5>Meet the hiring team</h5>
+                                            <div class="profile d-flex align-items-center">
+                                                <img th:src="${job.user.profileImage != null ? '/files/profileImage/' + job.user.userId : '/static/img/user.jpg'}" alt="profile"
+                                                    class="rounded-circle img-fluid me-3" style="width:50px; height:50px;">
+                                                <div class="profile-details" style="line-height: 20px;">
+                                                    <a th:href="@{/profile/{slug}(slug=${job.user.profileUrlSlug})}"
+                                                        th:text="${job.user.firstName} + ' ' + ${job.user.lastName}"
+                                                        class="text-dark"></a>
+                                                    <p class="mb-0" th:text="${job.user.headline}"></p>
+                                                    <small th:text="${job.user.address} + ', ' + ${job.user.country}"></small>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+    // Handle the job ID for the modal
+    var applyJobModal = document.getElementById('applyJobModal');
+    applyJobModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Button that triggered the modal
+        var jobId = button.getAttribute('data-job-id'); // Extract jobId from data-* attributes
+        var modalJobIdInput = document.getElementById('modalJobId');
+        modalJobIdInput.value = jobId; // Set the jobId in the hidden input field
+    });
+</script>
+        
+
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>

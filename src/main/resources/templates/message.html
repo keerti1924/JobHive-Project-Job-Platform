@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<style>
+ 	 .nav-tabs .nav-link {
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: green !important;
+        border-bottom: 1px solid green;
+    }
+
+    .nav-tabs {
+        border-bottom: 1 px solid #000;
+    }
+
+        .chat-message {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message .message-content {
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .chat-message.sent .message-content {
+            background-color: #e8eeeb;
+            align-self: flex-end;
+        }
+        .chat-message.received .message-content {
+            background-color: #eecfd2;
+            align-self: flex-start;
+        }
+        .chat-message.unread {
+		    background-color: #f0f8ff; 
+		    border-left: 2px solid #007bff; 
+		    
+		   }
+		   
+		   .received-content.bg-light {
+		    background-color: #f8f9fa !important; /* Adjust the color if needed */
+		}
+				   
+		@media (max-width: 995px) {
+		    .left-sidebar {
+		        display: block;
+		        width: 100%;
+		    }
+		    .right-content {
+		        display: none;
+		        width: 100%;
+		    }
+		    .show-right-content .right-content {
+		        display: block;
+		    }
+		    .show-right-content .left-sidebar {
+		        display: none;
+		    }
+		}
+		
+
+        
+</style>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+        <div class="container-fluid">
+            <div class="container py-2 py-lg-4">
+                <div class="row g-lg-4">
+                
+                <!-- Display success message -->
+				    <div th:if="${message}" class="alert alert-success" role="alert">
+				        <span th:text="${message}"></span>
+				    </div>
+				
+				    <!-- Display error message -->
+				    <div th:if="${error}" class="alert alert-danger" role="alert">
+				        <span th:text="${error}"></span>
+				    </div>
+				    
+                    <!-- Left Sidebar -->
+                    <div class="col-6 px-2">
+                    	<div class="row mb-lg-2">
+                            <div class="col-12">
+                                <div >
+                                    <div class="bg-white shadow p-4" style="border-radius: 10px; height: 85vh;">
+                                        <div class="row">
+                                            <div class="col-12 mt-2">
+                    	
+						                        <!-- Tabs -->
+						                        <ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+						                            <li class="nav-item" role="presentation">
+						                                <a class="nav-link active" id="allmessages-tab" data-bs-toggle="tab"
+						                                    href="#allmessages" role="tab" aria-controls="allmessages"
+						                                    aria-selected="true">All Messages </a>
+						                            </li>
+						                            <li class="nav-item" role="presentation">
+						                                <a class="nav-link" id="unread-tab" data-bs-toggle="tab"
+						                                    href="#unread" role="tab" aria-controls="unread"
+						                                    aria-selected="false">Unread (<span th:text="${unreadCount}">0</span>)</a>
+						                            </li>
+						                        </ul>
+						                        <!-- Tab Content -->
+						                        <div class="tab-content mt-4" id="myTabContent">
+						                        
+						                           <!-- All Messages Tab -->
+													<div class="tab-pane fade show active" id="allmessages" role="tabpanel" aria-labelledby="allmessages-tab">
+													    <div class="text-center" th:if="${#lists.isEmpty(connections)}">
+													        <p>No Messages Found.</p>
+													    </div>
+													    <div th:if="${!#lists.isEmpty(connections)}" th:each="user : ${connections}" class="d-flex align-items-center justify-content-between border-bottom p-2"  th:classappend="${user.userId == selectedUser?.userId} ? 'bg-light' : ''">
+													        <a th:href="@{/messages(userId=${user.userId})}" class="messagelink">
+													            <div class="received-content d-flex align-items-center py-2 p-2" >
+													                <img th:src="${user.profileImage != null ? '/files/profileImage/' + user.userId : '/static/img/user.jpg'}"
+													                     alt="profile image" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+													                <div class="content ms-3">
+													                    <h6 class="mb-0" th:text="${user.firstName} + ' ' + ${user.lastName}"></h6>
+													                    <!-- Fetch and display the last message for the current connection -->
+													                    <p class="mb-0 text-muted" style="font-size:14px;" th:text="${lastMessages.get(user)}"></p>
+													                    <small class="text-muted" style="font-size:12px;" th:text="${lastMessages.get(user) != 'No messages yet' ? '' + lastMessageFormattedTimestamps.get(user) : ''}"></small>
+													                </div>
+													            </div>
+													        </a>
+													    </div>
+													</div>
+						
+						                           <!-- Unread Messages Tab -->
+													<div class="tab-pane fade" id="unread" role="tabpanel" aria-labelledby="unread-tab">
+													    <!-- Display a message if there are no unread messages -->
+													    <div th:if="${#lists.isEmpty(unreadMessages)}" class="text-center">
+													        <img src="/static/img/message.png" class="img-fluid" alt="" width="100px">
+													        <p>You've read all the messages.</p>
+													    </div>
+													    
+													    <!-- Display each unread message -->
+													    <div th:if="${unreadCount > 0}" th:each="message : ${unreadMessages}" class="border-bottom">
+													        <div class="d-flex align-items-center justify-content-between p-2" th:classappend="${message.read ? '' : 'bg-light'}">
+													            <!-- Link to mark message as read -->
+													            <a th:href="@{/messages/markAsRead(messageId=${message.message_id}, userId=${message.sender.userId})}">
+													                <div class="received-content d-flex align-items-center">
+													                    <img th:src="${message.sender.profileImage != null ? '/files/profileImage/' + message.sender.userId : '/static/img/user.jpg'}" alt="" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+													                    <div class="content ms-3">
+													                        <h6 class="mb-0" th:text="${message.sender.firstName} + ' ' + ${message.sender.lastName}"></h6>
+													                        <p class="mb-0 text-muted" style="font-size:14px;">
+													                            <span th:text="${message.sender.firstName} + ': ' + ${message.content}"></span>
+													                        </p>
+													                        <small class="text-muted" style="font-size:12px;" th:text="${message.formattedTimestamp}"></small>
+													                    </div>
+													                </div>
+													            </a>
+													        </div>
+													    </div>
+													</div>
+
+
+
+						                        </div>
+                        
+                        					</div>
+                        				</div>
+                        			</div>
+                        		</div>
+                        	</div>
+                        </div>
+                    </div>
+                    <!-- Right Sidebar -->
+                    <div class="col-6 p-0">
+                        <!-- Chat Section -->
+                        <div class="row mb-lg-2">
+                            <div class="col-12">
+                                <div>
+                                    <div class="bg-white shadow p-4 mb-4" style="border-radius: 10px; height: 85vh;">
+                                        <div th:if="${selectedUser == null}" class="text-center d-flex align-items-center justify-content-center"
+                                            style="height: 70vh;">
+                                            <div class="p-5 m-2">
+                                                <img src="/static/img/start-message.png" class="img-fluid">
+                                                <h4>Start Messaging</h4>
+                                                <p>Select a user from your connections to start a conversation.</p>
+                                                <a href="/connections" class="btn btn-danger px-4 py-1 rounded-pill">Start Messaging</a>
+                                            </div>
+                                        </div>
+                                        <!-- Chat window -->
+                                        <div class="chat-window" th:if="${selectedUser != null}" >
+                                            <div class="chat-header d-flex justify-content-between mb-0 border-bottom">
+                                                <div class="text">
+                                                    <h5 class="mb-0" th:text="${selectedUser.firstName} + ' ' + ${selectedUser.lastName}"></h5>
+                                                    <p th:text="${selectedUser.headline}"></p>
+                                                </div>
+                                                <div class="dropdown">
+                                                    <a class="btn" href="#" role="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
+                                                        <i class="fa fa-ellipsis-v px-2"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu shadow border-0 p-2 py-3">
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deleteConfirmationModal" >Delete Conversation for Both</a></li>
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#markAsUnreadModal">Mark as unread</a></li>
+                                                    </ul>
+                                                </div>
+                                                
+                                                <!-- Mark As Unread Confirmation Modal -->
+												<div class="modal fade" id="markAsUnreadModal" tabindex="-1" aria-labelledby="markAsUnreadModalLabel" aria-hidden="true">
+												    <div class="modal-dialog">
+												        <div class="modal-content">
+												            <div class="modal-header">
+												                <h5 class="modal-title" id="markAsUnreadModalLabel">Mark as Unread</h5>
+												                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												            </div>
+												            <div class="modal-body">
+												                Are you sure you want to mark all messages with this user as unread?
+												            </div>
+												            <div class="modal-footer">
+												                <form id="markAsUnreadForm" method="post">
+												                    <input type="hidden" name="targetUserId" th:value="${selectedUser.userId}">
+												                    <button type="button" class="btn btn-primary rounded-pill px-4 py-1" data-bs-dismiss="modal">Cancel</button>
+												                    <button type="submit" class="btn btn-danger rounded-pill px-4 py-1">Mark as Unread</button>
+												                </form>
+												            </div>
+												        </div>
+												    </div>
+												</div>
+                                                
+                                                
+                                                 <!-- Delete Confirmation Modal -->
+												<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+												  <div class="modal-dialog">
+												    <div class="modal-content">
+												      <div class="modal-header">
+												        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirm Delete</h5>
+												        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												      </div>
+												      <div class="modal-body">
+												        Are you sure you want to delete all messages with this user?
+												      </div>
+												      <div class="modal-footer">
+												        <form id="deleteAllForm" method="post">
+												          <input type="hidden" name="targetUserId" th:value="${selectedUser.userId}">
+												          <button type="button" class="btn btn-primary rounded-pill px-4 py-1" data-bs-dismiss="modal">Cancel</button>
+												          <button type="submit" class="btn btn-danger rounded-pill px-4 py-1">Delete All</button>
+												        </form>
+												      </div>
+												    </div>
+												  </div>
+												</div>
+					
+                                            </div>
+
+                                            <div class="chat-body overflow-auto mt-2" style="height: 60vh;">
+                                                <div th:each="message : ${messages}" class="chat-message"
+                                                    th:classappend="${message.sender.userId == currentUser.userId} ? 'sent' : 'received'">
+                                                    <div class="message-content" th:text="${message.content}"></div>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="chat-footer">
+                                                <form th:action="@{/messages/send}" method="post" class="my-2">
+                                              		<div class="d-flex justify-content-between">
+	                                                    <input type="hidden" name="receiverId" th:if="${selectedUser != null}" th:value="${selectedUser.userId}">
+	                                                    <input type="text" name="messageContent" class="form-control"
+	                                                        placeholder="Type a message...">
+	                                                    <button type="submit" class="btn btn-danger ms-2">Send</button>
+	                                               	</div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        
+                                       
+                                        
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                   
+					
+                </div>
+            </div>
+        </div>
+    </main>
+	<script>
+	  document.querySelector('#deleteAllForm').action = '/messages/deleteAll'; 
+	  document.querySelector('#markAsUnreadForm').action = '/messages/markAllAsUnread';
+	</script>
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>

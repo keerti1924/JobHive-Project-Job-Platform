@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<style>
+    .nav-pills .nav-item.active {
+        color: rgb(190, 36, 36) !important;
+        background-color: transparent !important;
+    }
+</style>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <div class="container py-2 py-lg-4">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Vertical nav pills -->
+                <div class="nav flex-column nav-pills bg-white shadow" id="v-pills-tab" role="tablist"
+                    style="border-radius: 10px;" aria-orientation="vertical">
+                    <div class="header px-4 py-3 border-bottom">
+                        <h5><i class="fa fa-bookmark me-2"></i> My Items</h5>
+                    </div>
+                    <div class="nav-content d-flex justify-content-between px-4 py-2 pt-4 align-items-center">
+                        <a class="nav-item active text-muted" id="v-pills-posted-job-tab" data-bs-toggle="pill"
+                            href="#v-pills-posted-job" role="tab" aria-controls="v-pills-posted-job">Posted jobs</a>
+                        <span class="me-2" th:text="${postedJobsCount}"></span>
+                    </div>
+                    <div class="nav-content d-flex justify-content-between px-4 py-2 pb-4 align-items-center">
+                        <a class="nav-item text-muted" id="v-pills-my-job-tab" data-bs-toggle="pill"
+                            href="#v-pills-my-job" role="tab" aria-controls="v-pills-my-job">My jobs</a>
+                        <span class="me-2" th:text="${appliedJobsCount}"></span>
+                    </div>
+                    <hr>
+                    <div class="nav-content d-flex justify-content-between px-4 py-2 pb-4 align-items-center">
+                        <a class="nav-item text-muted" id="v-pills-applicants-tab" data-bs-toggle="pill"
+                            href="#v-pills-applicants" role="tab" aria-controls="v-pills-applicants">Applicants</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9 mt-lg-0 mt-2">
+                <!-- Tab content -->
+                <div class="tab-content bg-white shadow" style="border-radius: 10px;">
+
+                    <!-- Posted Jobs Tab -->
+                    <div class="tab-pane fade show active" id="v-pills-posted-job" role="tabpanel"
+                        aria-labelledby="v-pills-posted-job-tab">
+                        <div class="heading border-bottom">
+                            <h3 class="fw-normal p-4">Posted Jobs (<span th:text="${postedJobsCount}"></span>)</h3>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(postedJobs)}" class="p-4">
+                            <p>No jobs found.</p>
+                        </div>
+
+                        <div th:if="${!#lists.isEmpty(postedJobs)}">
+                            <div class="job-item d-flex justify-content-between align-items-center border-bottom"
+                                th:each="job : ${postedJobs}">
+                                <div class="d-flex align-items-center p-4" style="line-height: 18px;">
+                                    <img src="/static/img/company.png" alt="" width="50px">
+                                    <div class="content ms-3">
+                                        <h6 class="mb-0" th:text="${job.title}"></h6>
+                                        <p style="font-size: 15px;" class="mb-0" th:text="${job.company}"></p>
+                                        <small th:text="${job.location}"></small><br>
+                                        <small style="font-size: 12px;" th:text="'Created ' + ${timeUtils.formatRelativeTime(job.postedDate)}"></small>
+                                    </div>
+                                </div>
+                                <div th:if="${currentUser.userId == job.user.userId}">
+                                    <div class="dropdown">
+                                        <a class="btn" href="#" role="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                            <i class="fa fa-ellipsis-v px-2"></i>
+                                        </a>
+                                        <ul class="dropdown-menu shadow border-0" style="border-radius: 10px;">
+                                            <li>
+                                                <a th:href="@{/jobs/edit-job/{id}(id=${job.id})}" class="dropdown-item text-muted">
+                                                    <i class="fa fa-edit"></i> Manage Job
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <form th:action="@{/jobs/delete/{id}(id=${job.id})}" method="post" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                                                    <input type="hidden" name="_method" value="delete">
+                                                    <button type="submit" class="dropdown-item text-muted">
+                                                        <i class="fa fa-trash"></i> Delete Job
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Jobs Tab -->
+                    <div class="tab-pane fade" id="v-pills-my-job" role="tabpanel"
+                        aria-labelledby="v-pills-my-job-tab">
+                        <div class="heading border-bottom">
+                            <h3 class="fw-normal p-4">My Jobs(<span th:text="${appliedJobsCount}"></span>)</h3>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(jobApplications)}" class="p-4">
+                            <p>No jobs applied.</p>
+                        </div>
+
+                        <div th:if="${!#lists.isEmpty(jobApplications)}">
+                            <div class="job-item d-flex justify-content-between align-items-center border-bottom"
+                                th:each="jobApplication : ${jobApplications}">
+                                <div class="d-flex align-items-center p-4" style="line-height: 15px;">
+                                    <img src="/static/img/company.png" alt="" width="50px">
+                                    <div class="content ms-3">
+                                        <h6 class="mb-0" th:text="${jobApplication.job.title}"></h6>
+                                        <p style="font-size: 15px;" class="mb-0" th:text="${jobApplication.job.company}"></p>
+                                        <small th:text="${jobApplication.job.location}"></small><br>
+                                        <small style="font-size: 12px;" th:text="'Applied ' + ${timeUtils.formatRelativeTime(jobApplication.applicationDate)}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Applicants Tab -->
+                    <div class="tab-pane fade" id="v-pills-applicants" role="tabpanel"
+                        aria-labelledby="v-pills-applicants-tab">
+                        <div class="heading border-bottom">
+                            <h3 class="fw-normal p-4">Applicants</h3>
+                        </div>
+
+                        <div th:if="${#lists.isEmpty(postedJobs)}" class="p-4">
+                            <p>No applicants found.</p>
+                        </div>
+
+                        <div th:if="${!#lists.isEmpty(postedJobs)}">
+                            <div th:each="job : ${postedJobs}">
+                                <h4 class="fw-normal p-3" th:text="${job.title}"></h4>
+                                <div th:if="${jobApplicationsMap[job.id] == null or #lists.isEmpty(jobApplicationsMap[job.id])}" class="p-3">
+						            <p>No applicants found.</p>
+						        </div>
+                                <div th:if="${jobApplicationsMap[job.id] != null and !#lists.isEmpty(jobApplicationsMap[job.id])}">
+                                    <div class="applicant-item border-bottom" th:each="app : ${jobApplicationsMap[job.id]}">
+                                        <div class="d-flex align-items-center p-3">
+                                            <img th:src="${app.user.profileImage != null ? '/files/profileImage/' + app.user.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle" alt="" style="width:50px; height:50px;">
+                                            <div class="content ms-3">
+                                            	<a th:href="@{/profile/{slug}(slug=${app.user.profileUrlSlug})}">
+                                                	<h6 class="mb-0" th:text="${app.user.firstName + ' ' + app.user.lastName}"></h6>
+                                                </a>
+                                                <small th:text="${app.user.email}"></small><br>
+                                                <a th:href="@{/files/resume/{applicationId}(applicationId=${app.id})}" download>Download Resume</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+     <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>

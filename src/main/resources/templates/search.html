@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+</head>
+<style>
+    .nav-tabs .nav-link {
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: green !important;
+        border-bottom: 1px solid green;
+    }
+
+    .nav-tabs {
+        border-bottom: 1 px solid #000;
+    }
+    .btn-success:hover {
+    background-color: transparent !important;
+    color: var(--secondary) !important;
+    border: 1px solid var(--secondary);
+}
+</style>
+<body>
+
+    <div th:replace="~{layout :: page_navbar}"></div>
+     
+         <div class="container-fluid">
+        
+        <div class="container py-2 py-lg-4">
+            <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                <div class="row">
+                    <div class="col-12 mt-2">
+                        <h5 class="fw-normal mb-3">Search Results</h5>
+                        <!-- Tabs -->
+                        <ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" id="people-tab" data-bs-toggle="tab" href="#people" role="tab" aria-controls="people" aria-selected="true">People (<span th:text="${peopleCount}">0</span>)</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="article-tab" data-bs-toggle="tab" href="#article" role="tab" aria-controls="article" aria-selected="false">Articles (<span th:text="${articleCount}">0</span>)</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="event-tab" data-bs-toggle="tab" href="#event" role="tab" aria-controls="event" aria-selected="false">Events (<span th:text="${eventCount}">0</span>)</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="post-tab" data-bs-toggle="tab" href="#post" role="tab" aria-controls="post" aria-selected="false">Posts (<span th:text="${postCount}">0</span>)</a>
+                            </li>
+                        </ul>
+
+                        <!-- Tab Content -->
+                        <div class="tab-content mt-4" id="myTabContent">
+
+                            <!-- People Tab -->
+                            <div class="tab-pane fade show active" id="people" role="tabpanel" aria-labelledby="people-tab">
+                                
+                                <div class="p-2" th:if="${#lists.isEmpty(people)}">
+                                    <p>No People found.</p>
+                                </div>
+                                <div th:if="${!#lists.isEmpty(people)}" th:each="user : ${people}">
+	                                <div class="d-flex align-items-center justify-content-between">
+					                    <div class="people-content d-flex align-items-center">
+					                        <img th:src="${user.profileImage != null ? '/files/profileImage/' + user.userId : '/static/img/user.jpg'}" 
+					                             alt="" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+					                        <div class="content ms-3">
+					                            <a th:href="@{/profile/{slug}(slug=${user.profileUrlSlug})}">
+					                                <h6 class="mb-0" th:text="${user.firstName} + ' ' + ${user.lastName}">Ajay Kumar</h6>
+					                            </a>
+					                            <p class="mb-0" th:text="${user.headline}"></p>
+					                            <small class="mb-0" th:text="${user.address}"></small>
+					                        </div>
+					                    </div>
+					                    <a th:href="@{/messages/{userId}(userId=${messageUserId})}" class="btn btn-danger rounded-pill px-4 py-1">Message</a>
+					                </div>
+                                </div>
+                                <hr>
+                            </div>
+
+                             <!-- Article Tab -->
+                             <div class="tab-pane fade show" id="article" role="tabpanel" aria-labelledby="article-tab">
+                                
+                                <div class="p-2" th:if="${#lists.isEmpty(articles)}">
+                                    <p>No Articles found.</p>
+                                </div>
+                                <div th:if="${!#lists.isEmpty(articles)}" th:each="article : ${articles}" class="mb-2">
+					                <div class="d-flex align-items-center justify-content-between">
+					                    <div class="people-content d-flex align-items-center">
+					                        <img th:src="@{/files/articleImage/{articleId}(articleId=${article.id})}"
+					                             alt="" style="width: 80px; height: 60px;" class="img-fluid">
+					                        <div class="content ms-3">
+					                            <a th:href="@{/articles/article/{articleId}(articleId=${article.id})}">
+					                                <h6 class="mb-0" th:text="${article.title}"></h6>
+					                            </a>
+					                            <p class="mb-0" th:text="${timeUtils.formatRelativeTime(article.publicationDate)}"></p>
+					                        </div>
+					                    </div>                                 
+					                </div>
+					            </div>
+                               
+                            </div>
+
+                            <!-- Event Tab -->
+                            <div class="tab-pane fade show" id="event" role="tabpanel" aria-labelledby="event-tab">
+              
+                                <div class="p-2" th:if="${#lists.isEmpty(events)}">
+                                    <p>No Events found.</p>
+                                </div>
+                                <!-- Iterate over the events list -->
+							    <div class="d-flex align-items-center justify-content-between" th:each="event : ${events}">
+							        <div class="people-content d-flex align-items-center">
+							            <!-- Event image -->
+							            <img th:src="@{/files/images/{eventId}(eventId=${event.eventId})}" alt="Event Image" style="width: 80px; height: 60px;" class="img-fluid">
+							
+							            <!-- Event details -->
+							            <div class="content ms-3">
+							                <a th:href="@{/events/event-details/(eventId=${event.eventId})}">
+							                    <h6 class="mb-0" th:text="${event.event_name}">Event Name</h6>
+							                </a>
+							                <p class="mb-0" th:text="${timeUtils.formatRelativeTime(event.timestamp)}">Event Timestamp</p>
+							                <p class="mb-0" th:text="'Date: ' + ${event.date} + ' | Time: ' + ${event.time}">Event Date and Time</p>
+							                <p class="mb-0" th:text="'Mode: ' + ${event.mode}">Event Mode</p>
+							                
+							            </div>
+							        </div>
+							    </div>
+                                <hr>
+                            </div>
+
+                            <!-- Post Tab -->
+                            <div class="tab-pane fade" id="post" role="tabpanel" aria-labelledby="post-tab">
+                                <!-- Check if there are post requests -->
+                                <div class="p-2" th:if="${#lists.isEmpty(posts)}">
+                                    <p>No posts found.</p>
+                                </div>
+                               <div class="post-content border p-2 mb-2" style="border-radius: 10px;" th:if="${!#lists.isEmpty(posts)}">
+					
+                                    <div class="row mb-2" data-wow-delay="0.1s" style="border-radius: 10px;"  th:each="post : ${posts}">
+                                        <div class="post-card">
+                                           
+                                               <div class="post-content mt-2 d-flex align-items-center">
+                                               		<div class="post-image">
+                                                
+		                                                <div class="media me-2">
+		                                                    <div th:if="${post.image != null}">
+		                                                        <img th:src="@{/files/image/{postId}(postId=${post.postId})}" alt="Post Media" style="width: 80px; height: 60px;">
+		                                                    </div>
+		                                                    <div th:if="${post.document != null}">
+		                                                        <iframe th:src="@{/files/document/{postId}(postId=${post.postId})}" 
+		                                                                width="80px" 
+		                                                                height="60px" 
+		                                                                style="border: none;">
+		                                                        </iframe>
+		                                                    </div>
+		                                                </div>
+		                                             
+		                                            </div>
+                                                   	<div class="post-description">
+	                                                    
+	                                                    <small style="font-size: 15px;" th:text="${timeUtils.truncateToWords(post.description, 30)}"></small>
+	                                                    
+                                                   </div>
+                                                </div>
+                                                <div class="post-header d-flex align-items-center mt-2" style="margin-left:80px;">
+			                                                <img src="img/about.jpg" th:src="${post.user.profileImage != null ? '/files/profileImage/' + post.user.userId : '/static/img/user.jpg'}" 
+			                                                     alt="Profile Picture"
+			                                                     class="profile-img rounded-circle"
+			                                                     style="width: 40px; height: 40px;">
+			            
+			                                                     
+			                                                <div class="user-info">
+			                                                
+			                                                
+				                                                <a th:href="@{/profile/{slug}(slug=${post.user.profileUrlSlug})}">
+				                                                    <h6 class="m-0" th:text="${post.user.firstName} + ' ' + ${post.user.lastName}">
+				                                                        <span class="text-muted" th:text="'('+${post.user.pronouns}+')'"></span>
+				                                                    </h6>
+				                                                 </a>
+				                                                    <small class="text-muted m-0" th:text="${post.user.headline}"></small>
+				                                                    <small class="text-muted" th:text="${post.formattedTimestamp}"></small>
+			                                                </div>
+			                                              
+			                                            </div>
+                                         </div>
+                                            
+
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>               
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="~{layout :: page_footer}"></footer>
+
+</body>
+</html>

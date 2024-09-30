@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+   
+</head>
+<style>
+.profile-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e1dfdd;
+            position: relative;
+        }
+        .cover-photo {
+            height: 200px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+}
+    .btn-edit-background i {
+        font-size: 14px;
+    }
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            position: absolute;
+            top: 100px;
+            right: 80px;
+        }
+        .profile-buttons {
+            margin-top: 10px;
+        }
+        .profile-buttons .btn {
+            margin-right: 5px;
+        }
+        label{
+                font-size: 14px;
+                color: #333;
+            }
+
+        @media (max-width: 575px) {
+            .cover-photo {
+                height: 150px;
+            }
+            .profile-img {
+            width: 100px;
+            height: 100px;
+            top: 100px;
+            left: 120px;
+            }
+        }
+
+</style>
+<body>
+
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+    	<!-- Main Section Start  -->
+    	
+        <div class="container-fluid p-0" >
+            <div class="container py-2 py-lg-4">
+             		<!-- Check for success message -->
+				    <div th:if="${successMessage}" class="alert alert-success text-center p-2">
+				        <small th:text="${successMessage}"></small>
+				    </div>
+				
+				    <!-- Check for error message -->
+				    <div th:if="${errorMessage}" class="alert alert-danger">
+				        <p th:text="${errorMessage}"></p>
+				    </div>
+    				
+                <div class="row g-md-5 g-lg-3">
+    				
+                    <!-- Left Content Start -->
+                    <div class="col-lg-9 col-md-7 py-0">
+    
+                        <!-- Personal Info Section Start -->
+                        <div class="row pt-2 mx-lg-1 shadow bg-white mb-2" 
+                            style="border-radius: 10px;">
+                            <div class="container">
+                                <div class="profile-header">
+                                   										
+									<!-- Show custom background if exists -->
+									<div class="cover-photo" 
+									     th:if="${currentUser.backgroundImage != null}"
+									     th:style="'background-image: url(/files/backgroundImage/' + ${currentUser.userId} + ')'">
+									</div>
+									
+									<!-- Show default background if custom background does not exist -->
+									<div class="cover-photo" 
+									     th:if="${currentUser.backgroundImage == null}"
+									     th:style="'background-image: url(/static/img/background.png)'">
+									</div>
+									
+									
+									<!-- Show custom profile image if exists -->
+									<img alt="Profile Image" 
+									     th:if="${currentUser.profileImage != null}"
+									     th:src="'/files/profileImage/' + ${currentUser.userId}" 
+									     class="profile-img img-fluid" />
+									
+									<!-- Show default profile image if custom profile image does not exist -->
+									<img alt="Profile Image" 
+									     th:if="${currentUser.profileImage == null}"
+									     th:src="@{/static/img/user.jpg}" 
+									     class="profile-img img-fluid" />
+									     
+     
+                                    <div class="profile-info mt-5 mt-lg-4 p-lg-3 d-flex justify-content-between">
+                                        <div class="profile mb-4">
+                                            <h4 class="fw-normal mb-0" th:text="${currentUser.firstName} + ' ' + ${currentUser.lastName}"> <span class="text-muted fs-6"> (She/Her)</span></h4>
+                                            <p class="fs-8 mb-0" th:text="${currentUser.headline}"></p>
+                                            <small><span th:text="${currentUser.city} + ', ' + ${currentUser.country}"></span> · 
+                                                <!-- Button trigger modal -->
+                                                <button type="button" class="btn text-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+                                                    <small>Contact info</small>
+                                                  </button>
+  
+                                            <!-- Contact Modal -->
+                                            <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                    <h5 class="modal-title" id="contactModalLabel" th:text="${currentUser.firstName} + ' ' + ${currentUser.lastName}"></h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                    <h4 class="mt-3">Contact Information</h4>
+
+                                                        <h6>Your Profile</h6>
+                                                        <a th:href="@{/profile/{slug}(slug=${currentUser.profileUrlSlug})}">
+															<p th:text="'jobhive.com/in/' +${currentUser.profileUrlSlug}"></p>
+                                                        </a>
+
+                                                        <h6>Phone</h6>
+                                                        <p th:text="${currentUser.phoneNumber}"></p>
+
+                                                        <h6>Address</h6>
+                                                        <p th:text="${currentUser.address} + ', ' +${currentUser.city} + ', ' + ${currentUser.country}"></p>
+
+                                                        <h6>Email</h6>
+                                                        <p th:text="${currentUser.email}"></p>
+
+                                                        <h6>Birthday</h6>
+                                                        <p th:text="${currentUser.birthday}"></p>
+
+                                                    </div>
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                            </small><br>
+                                            <small><a href="/networks/connections" th:text="${connectionCount} + ' Connections'"></a></small>
+                                            <div class="profile-buttons d-flex align-items-center" th:if="${currentUser.buttonName != null and currentUser.url != null}">
+											    <a target="_blank" th:href="${currentUser.url}" class="btn btn-danger rounded-pill btn-sm px-3" th:text="${currentUser.buttonName}"></a>
+											</div>
+                                        </div>
+                                        <div class="edit" >
+                                            <button type="button" class="btn rounded-circle" data-bs-toggle="modal" data-bs-target="#editModal">
+                                                <i class="fa fa-pencil-alt text-secondary-subtle"></i>
+                                            </button> 
+                                            <!-- Edit button modal start  -->
+                                            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true" >
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" >
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                    <h5 class="modal-title" id="editModalLabel">Edit Intro</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                    <form action="/user/update" method="post" enctype="multipart/form-data" th:object="${currentUser}">
+													    <input type="hidden" name="userId" th:value="${currentUser.userId}">
+													
+													    <!-- Profile Images -->
+													    <div class="form-input mb-2">
+													        <label for="profile">Profile Image</label>
+													        <input type="file" name="profileImage" id="profile" class="form-control">
+													    </div>
+													    <div class="form-input mb-2">
+													        <label for="background">Background Image</label>
+													        <input type="file" name="backgroundImage" id="background" class="form-control">
+													    </div>
+													
+													    <!-- Basic Information -->
+													    <div class="form-input mb-2">
+													        <label for="fname">First Name <sup>*</sup></label>
+													        <input type="text" name="firstName" id="fname" class="form-control" th:value="${currentUser.firstName}" required>
+													    </div>
+													    <div class="form-input mb-2">
+													        <label for="lname">Last Name <sup>*</sup></label>
+													        <input type="text" name="lastName" id="lname" class="form-control" th:value="${currentUser.lastName}" required>
+													    </div>
+													
+													    <div class="form-input mb-2">
+													        <label for="pronouns">Pronouns</label>
+													        <select name="pronouns" id="pronouns" class="form-control">
+													            <option value="" th:selected="${currentUser.pronouns == null}">--Please Select--</option>
+													            <option value="She/Her" th:selected="${currentUser.pronouns == 'She/Her'}">She/Her</option>
+													            <option value="He/Him" th:selected="${currentUser.pronouns == 'He/Him'}">He/Him</option>
+													            <option value="They/Them" th:selected="${currentUser.pronouns == 'They/Them'}">They/Them</option>
+													        </select>
+													    </div>
+													
+													    <div class="form-input mb-2">
+													        <label for="Headline">Headline <sup>*</sup></label>
+													        <textarea name="headline" rows="3" id="headline" class="form-control" th:text="${currentUser.headline}" required></textarea>
+													    </div>
+													
+													    <!-- Location -->
+													    <div class="form-input mb-3">
+													        <label for="country">Country/Region <sup>*</sup></label>
+													        <input type="text" name="country" id="country" class="form-control" th:value="${currentUser.country}" required>
+													    </div>
+													    <div class="form-input mb-3">
+													        <label for="city">City <sup>*</sup></label>
+													        <input type="text" name="city" id="city" class="form-control" th:value="${currentUser.city}" required>
+													    </div>
+													
+													    <!-- Contact Information -->
+													    <div class="form-input mb-3">
+													        <label for="email">Email <sup>*</sup></label>
+													        <input type="email" name="email" id="email" class="form-control" th:value="${currentUser.email}" required>
+													    </div>
+													    <div class="form-input mb-3">
+													        <label for="phone">Phone Number <sup>*</sup></label>
+													        <input type="text" name="phoneNumber" pattern="\d{10}" title="Please enter a 10-digit phone number" id="phone" class="form-control" th:value="${currentUser.phoneNumber}" required>
+													    </div>
+													
+													    <div class="form-input mb-3">
+													        <label for="address">Address <sup>*</sup></label>
+													        <textarea name="address" id="address" rows="3" class="form-control" th:text="${currentUser.address}" required></textarea>
+													    </div>
+													
+													    <div class="form-input mb-3">
+													        <label for="birthday">Birthday</label>
+													        <input type="date" name="birthday" id="birthday" class="form-control" th:value="${currentUser.birthday}">
+													    </div>
+													
+													    <div class="form-input mb-3">
+													        <label for="buttonname">Button Name</label>
+													        <select name="buttonName" id="buttonname" class="form-control">
+													            <option value="" th:selected="${currentUser.buttonName == null}">--Please Select--</option>
+													            <option value="View my portfolio" th:selected="${currentUser.buttonName == 'View my portfolio'}">View my portfolio</option>
+													            <option value="Visit my website" th:selected="${currentUser.buttonName == 'Visit my website'}">Visit my website</option>
+													            <option value="Visit my store" th:selected="${currentUser.buttonName == 'Visit my store'}">Visit my store</option>
+													            <option value="View my blog" th:selected="${currentUser.buttonName == 'View my blog'}">View my blog</option>
+													        </select>
+													    </div>
+													
+													    <div class="form-input mb-3">
+													        <label for="url">URL</label>
+													        <input type="url" name="url" id="url" class="form-control" th:value="${currentUser.url}">
+													    </div>
+													
+													    <div class="form-input mb-3">
+													        <label for="password">Password</label>
+													        <input type="password" name="password" id="password" class="form-control" th:value="${currentUser.password}">
+													    </div>
+													
+													    <hr>
+													    <button type="submit" class="btn btn-danger rounded-pill px-4">Save</button>
+													</form>
+                                                    </div>
+                                                    
+                                                </div>
+                                                </div>
+                                            </div>
+                                            <!-- Edit button modal end  -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+    
+                        </div>
+                        <!-- Personal Info Section End -->   
+                        
+                        <!-- About Section Start -->
+                        <div class="row pt-2 mx-lg-1 shadow bg-white mb-2"  style="border-radius:10px;">
+                            <div class="container">
+                                <div class="about-section d-flex justify-content-between p-lg-3 p-2">
+                                    <div class="about">
+                                        <h4>About</h4>
+                                        <small th:utext="${currentUser.about != null} ? ${currentUser.about} : 'No about information available.'"></small>
+                                    </div>
+                                    <div class="edit">
+                                        <!-- Button trigger modal -->
+                                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                                           <i class="fa fa-pencil-alt"></i>
+                                        </button>
+  
+                                        <!-- About Modal Start -->
+                                        <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                <h5 class="modal-title" id="aboutModalLabel">Edit About</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="container p-2">
+                                                        <form th:action="@{/user/update-about}" method="post">
+						                                    <label for="about">About</label>
+						                                    <textarea name="about" id="froala-editor" rows="5" class="form-control" th:text="${currentUser.about}"></textarea>
+						                                    <input type="hidden" name="userId" th:value="${currentUser.userId}">
+                                                			<hr>
+                                                			<button type="submit" class="btn btn-danger rounded-pill px-3 btn-sm mt-2">Save</button>
+						                                </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            </div>
+                                        </div>
+                                          <!--About Modal End-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- About Section End -->
+
+
+                        <!-- Activity Section Start  -->
+                        <div class="row pt-2 mx-lg-1 shadow bg-white mb-2" >
+                            <div class="container">
+                                <div class="activity p-lg-3 p-2">
+                                    <h4>Activity</h4>
+                                    <small><a href="/networks/people-follow/following" th:text="${followersCount} + ' followers' "></a></small>
+
+                                    <h5>Posts</h5>
+									
+									<!-- Check if posts are available -->
+						            <div th:if="${#lists.isEmpty(posts)}">
+						                <p>No posts available</p>
+						            </div>
+            
+                                    <div th:each="post, iterStat : ${posts}">
+						                <a href="/home" class="text-muted">
+						                	<div class="post" th:if="${iterStat.index < 3}">
+							                    <!-- Display the user's full name -->
+							                    <small style="font-size:12px;" th:text="${post.user.firstName + ' ' + post.user.lastName} + ' posted this  • ' + ${timeUtils.formatRelativeTime(post.timestamp)}"></small>
+							                    
+							                    <!-- Post content -->
+							                    <div class="post-content d-flex justify-content-center align-items-center mt-2">
+							                        <!-- Display the post image -->
+							                        <img th:if="${post.image != null}"
+							                             th:src="@{/files/image/{postId}(postId=${post.postId})}"
+							                             alt="Post Image" class="img-fluid rounded me-2" style="width:80px; height:50px">
+							                        <!-- Post description -->
+							                        <small class="text-dark" th:text="${post.description}"></small>
+							                    </div>
+							                    
+							                    <!-- Post likes and comments -->
+							                    <div class="content d-flex justify-content-between mt-2">
+							                        <small>
+							                            <i class="fa fa-thumbs-up"></i> <span th:text="${post.likedByUsers.size()}"></span> Likes
+							                        </small>
+							                        <small class="me-3"><span th:text="${post.comments.size()}"></span> comments</small>
+							                    </div>
+						                	</div>
+						                </a>
+                                    	<hr>
+									</div>
+                                    <div class="button text-center" th:if="${!#lists.isEmpty(posts)}">
+                                        <a href="" class="text-danger">Show all posts <i class="fa fa-arrow-right"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Activity Section End  -->
+
+                        <!-- Experience Section Start -->
+						<div class="row pt-2 mx-lg-1 shadow bg-white mb-2"  style="border-radius: 10px;">
+						    <div class="container">
+						        <div class="activity p-3">
+						            <div class="header d-flex justify-content-between">
+						                <h4>Experience</h4>
+						                <div class="icon">
+						                    <i class="fa fa-plus me-4 text-secondary-subtle" data-bs-toggle="modal" data-bs-target="#experienceaddModal"></i>
+						                    <!-- Experience add modal start -->
+						                    <div class="modal fade" id="experienceaddModal" tabindex="-1" aria-labelledby="experienceaddModalLabel" aria-hidden="true">
+						                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+						                            <div class="modal-content">
+						                                <div class="modal-header">
+						                                    <h5 class="modal-title" id="experienceaddModalLabel">Add Experience</h5>
+						                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						                                </div>
+						                                <div class="modal-body">
+						                                    <form action="/profile/saveExperience" method="post">
+						                                        <div class="form-input mb-2">
+						                                            <label for="title">Title <sup>*</sup></label>
+						                                            <input type="text" name="title" id="title" class="form-control" required>
+						                                        </div>
+						                                        <div class="form-input mb-2">
+						                                            <label for="company">Company Name <sup>*</sup></label>
+						                                            <input type="text" name="company" id="company" class="form-control" required>
+						                                        </div>
+						
+						                                        <div class="form-input mb-2">
+						                                            <label for="employment">Employment Type</label>
+						                                            <select name="employment" id="employment" class="form-control">
+						                                                <option value="">--Please Select--</option>
+						                                                <option value="Full-Time">Full-Time</option>
+						                                                <option value="Part-Time">Part-Time</option>
+						                                                <option value="Internship">Internship</option>
+						                                                <option value="Freelancer">Freelancer</option>
+						                                                <option value="Trainee">Trainee</option>
+						                                            </select>
+						                                        </div>
+						
+						                                        <div class="form-input mb-2">
+						                                            <label for="location">Location <sup>*</sup></label>
+						                                            <input type="text" name="location" id="location" class="form-control" required>
+						                                        </div>
+						
+						                                        <div class="form-input mb-2">
+						                                            <label for="locationtype">Location Type</label>
+						                                            <select name="locationtype" id="locationtype" class="form-control">
+						                                                <option value="">--Please Select--</option>
+						                                                <option value="On-Site">On-Site</option>
+						                                                <option value="Hybrid">Hybrid</option>
+						                                                <option value="Remote">Remote</option>
+						                                            </select>
+						                                        </div>
+						
+						                                        <div class="form-input mb-2">
+						                                            <label for="startdate">Start Date <sup>*</sup></label>
+						                                            <input type="date" name="startdate" id="startdate" class="form-control" required>
+						                                        </div>
+						
+						                                        <div class="form-input mb-2">
+						                                            <label for="enddate">End Date <sup>*</sup></label>
+						                                            <input type="date" name="enddate" id="enddate" class="form-control">
+						                                        </div>
+						
+						                                        <div class="modal-footer">
+						                                            <button type="submit" class="btn btn-danger rounded-pill px-4">Save</button>
+						                                        </div>
+						                                    </form>
+						                                </div>
+						                            </div>
+						                        </div>
+						                    </div>
+						                    <!-- Experience add modal end -->
+						                    <a href="/profile/details/experience" class="text-muted">
+							                    <i class="fa fa-pencil-alt"></i>
+						                    </a>
+						                </div>
+						            </div>
+							
+						            <!-- Display experiences -->
+						            <div th:if="${#lists.isEmpty(experiences)}">
+						                <p>Add Your Experience</p>
+						            </div>
+						            <div class="experience" th:if="${!#lists.isEmpty(experiences)}">
+						                <div th:each="experience : ${experiences}" class="experience-content d-flex align-items-center mt-2">
+						                    <img src="/static/img/experience.png" alt="" class="img-fluid rounded me-2" style="width: 80px; height: 80px;">
+						                    <div class="content">
+						                        <h6 class="mb-0" th:text="${experience.title}"></h6>
+						                        <p class="mb-0" th:text="${experience.company + ' · ' + experience.employmentType}"></p>
+						                        <small th:text="${experience.startDate} + ' to ' + ${experience.endDate}"></small>
+						                        <br>
+						                        <small th:text="${experience.location + ' · ' + experience.locationType}"></small>
+						                    </div>
+						            		<hr>
+						                </div>
+						            </div>
+						            <hr>
+                                    <div class="button text-center" th:if="${!#lists.isEmpty(experiences)}">
+                                        <a href="/profile/details/experience" class="text-danger">Show all experiences <i class="fa fa-arrow-right"></i></a>
+                                    </div>
+						        </div>
+						    </div>
+						</div>
+						<!-- Experience Section End -->
+
+
+                        <!-- Education Section Start -->
+					<div class="row pt-2 mx-lg-1 shadow bg-white mb-2" 
+					     style="border-radius: 10px;">
+					    <div class="container">
+					        <div class="education p-3">
+					            <div class="header d-flex justify-content-between">
+					                <h4>Education</h4>
+					                <div class="icon">
+					                    <i class="fa fa-plus me-4 text-secondary-subtle" data-bs-toggle="modal" data-bs-target="#educationaddModal"></i>
+					                    <!-- Education add modal start -->
+					                    <div class="modal fade" id="educationaddModal" tabindex="-1" aria-labelledby="educationaddModalLabel" aria-hidden="true">
+					                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+					                            <div class="modal-content">
+					                                <div class="modal-header">
+					                                    <h5 class="modal-title" id="educationaddModalLabel">Add Education</h5>
+					                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					                                </div>
+					                                <div class="modal-body">
+					                                    <form action="/profile/addEducation" method="post">
+					                                        <input type="hidden" name="userId" value="${currentUser.userId}">
+					                                        <div class="form-input mb-2">
+					                                            <label for="school">School or University <sup>*</sup></label>
+					                                            <input type="text" name="school" id="school" class="form-control" placeholder="Ex: Boston University" required>
+					                                        </div>
+					                                        <div class="form-input mb-2">
+					                                            <label for="degree">Degree <sup>*</sup></label>
+					                                            <input type="text" name="degree" id="degree" class="form-control" placeholder="Ex: Bachelor of Computer Applications" required>
+					                                        </div>
+					                                        <div class="form-input mb-2">
+					                                            <label for="field">Field of Study <sup>*</sup></label>
+					                                            <input type="text" name="field" id="field" class="form-control" placeholder="Ex: Computer Science" required>
+					                                        </div>
+					                                        <div class="form-input mb-2">
+					                                            <label for="startdate">Start Date <sup>*</sup></label>
+					                                            <input type="date" name="startDate" id="startdate" class="form-control" required>
+					                                        </div>
+					                                        <div class="form-input mb-2">
+					                                            <label for="enddate">End Date (Expected) <sup>*</sup></label>
+					                                            <input type="date" name="endDate" id="enddate" class="form-control" required>
+					                                        </div>
+					                                        <div class="form-input mb-2">
+					                                            <label for="percentage">Percentage or Grade <sup>*</sup></label>
+					                                            <input type="text" name="percentage" id="percentage" class="form-control" required>
+					                                        </div>
+					                                        <div class="form-input mb-2">
+					                                            <label for="desc">Description</label>
+					                                            <textarea name="description" id="desc" rows="5" class="form-control"></textarea>
+					                                        </div>
+					                                        <div class="modal-footer">
+					                                            <button type="submit" class="btn btn-danger rounded-pill px-4">Save</button>
+					                                        </div>
+					                                    </form>
+					                                </div>
+					                            </div>
+					                        </div>
+					                    </div>
+					                    <!-- Education add modal end -->
+					                    <a href="/profile/details/education" class="text-muted">
+						                    <i class="fa fa-pencil-alt"></i>
+					                    </a>
+					                </div>
+					            </div>
+					
+								<div th:if="${#lists.isEmpty(educations)}">
+									<p>Add Your Education</p>
+								</div>
+					            <div class="education" th:if="${!#lists.isEmpty(educations)}">
+					                <div class="education-content d-flex align-items-center mt-2" th:each="edu : ${educations}">
+					                    <img src="/static/img/education.png" alt="" class="img-fluid rounded-circle me-2" style="width: 80px; height: 80px;">
+					                    <div class="content">
+					                        <h6 class="mb-0" th:text="${edu.school}"></h6>
+					                        <p class="mb-0" th:text="${edu.degree} + ', ' + ${edu.field}"></p>
+					                        <small th:text="${edu.startDate} + ' to ' + ${edu.endDate}"></small>
+					                        <p class="mt-2" style="font-size: 14px;" th:text="${edu.description}"></p>
+					                    </div>
+					                </div>
+					            </div>
+					            <hr>
+					            <div class="button text-center" th:if="${!#lists.isEmpty(educations)}">
+					                <a href="/profile/details/education" class="text-danger">Show all educations <i class="fa fa-arrow-right"></i></a>
+					            </div>
+					
+					        </div>
+					    </div>
+					</div>
+					<!-- Education Section End -->
+					
+					
+
+
+                    </div>
+                    <!-- Left Content End -->
+    
+                    <!-- Right Sidebar Start -->
+                    <div class="col-lg-3 col-md-5 p-0">
+    
+                        <!-- Language Section Start -->
+                        <div class="row mb-2">
+                            <div class="col-12">
+                                <div >
+                                    <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                                        <div class="language d-flex justify-content-between">
+                                            <div class="text">
+                                                <h5>Profile Language</h5>
+                                               	<small>English</small>
+                                               	<div id="google_translate_element"></div>
+                                            </div>
+
+                                        </div>
+                                        <hr>
+                                        <div class="url">
+                                            <h5>Public profile & URL</h5>
+                                            <small th:text="'http://localhost:8080/profile/' +${currentUser.profileUrlSlug}"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Language Section End -->
+
+                        <!-- Skill Section Start -->
+                        <div class="row mb-2">
+							<div class="col-12">
+							        <div class="skill bg-white shadow p-4" style="border-radius: 10px;">
+							            <div class="header d-flex justify-content-between">
+							                <h4>Skills</h4>
+							                <div class="icon">
+							                    <i class="fa fa-plus me-4 text-secondary-subtle" data-bs-toggle="modal" data-bs-target="#skilladdModal"></i>
+							                    <!-- Skill add modal start -->
+							                    <div class="modal fade" id="skilladdModal" tabindex="-1" aria-labelledby="skilladdModalLabel" aria-hidden="true">
+							                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+							                            <div class="modal-content">
+							                                <div class="modal-header">
+							                                    <h5 class="modal-title" id="skilladdModalLabel">Add Skill</h5>
+							                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							                                </div>
+							                                <div class="modal-body">
+							                                    <form action="/profile/addSkill" method="post">
+							                                        <input type="hidden" name="userId" value="${currentUser.userId}">
+							                                        <div class="form-input mb-2">
+							                                            <label for="skill">Skill <sup>*</sup></label>
+							                                            <input type="text" name="skill" id="skill" class="form-control" placeholder="Skill (Ex: Project Management)" required>
+							                                        </div>
+							                                        <div class="modal-footer">
+							                                            <button type="submit" class="btn btn-danger rounded-pill px-4">Save</button>
+							                                        </div>
+							                                    </form>
+							                                </div>
+							                            </div>
+							                        </div>
+							                    </div>
+							                    <!-- Skill add modal end -->
+							                    <a href="/profile/details/skill">
+								                    <i class="fa fa-pencil-alt text-muted"></i>
+							                    </a>
+							                </div>
+							            </div>
+										
+										<div th:if="${#lists.isEmpty(skills)}">
+											<p>Add Your New Skills</p>
+										</div>
+										
+							            <div class="skill-content mt-4" th:if="${!#lists.isEmpty(skills)}" th:each="skill : ${skills}">
+							                <h6 class="mb-0" th:text="${skill.skill}"></h6>
+							            </div>
+							            <hr>
+							            <div class="button text-center" th:if="${!#lists.isEmpty(skills)}">
+							                <a href="/profile/details/skill" class="text-danger">Show all skills <i class="fa fa-arrow-right"></i></a>
+							            </div>
+							
+							        </div>
+
+							</div>
+							<!-- Skill Section End -->
+                        </div>
+        
+    
+                    </div>
+                    <!-- Right Sidebar End -->
+    
+                </div>
+    
+            </div>
+        </div>
+    
+        <!-- Main Section End  -->
+    </main>
+	
+    <footer th:replace="~{layout :: page_footer}"></footer>
+    <script>
+	  	//editor
+	    new FroalaEditor('#froala-editor'); 	
+	</script>
+	<script type="text/javascript">
+			function googleTranslateElementInit() {
+			  new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+			}
+		</script>
+
+</body>
+</html>

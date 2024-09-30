@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+</head>
+<style>
+    .nav-tabs .nav-link {
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: green !important;
+        border-bottom: 1px solid green;
+    }
+
+    .nav-tabs {
+        border-bottom: 1 px solid #000;
+    }
+    .btn-success:hover {
+    background-color: transparent !important;
+    color: var(--secondary) !important;
+    border: 1px solid var(--secondary);
+}
+</style>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+        <!-- Main Section Start  -->
+        <div class="container-fluid">
+        
+            <div class="container py-2 py-lg-4">
+                <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <h5 class="fw-normal mb-3" th:text="${currentUser.firstName} + '\'s Network'"></h5>
+                            <!-- Tabs -->
+                            <ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="received-tab" data-bs-toggle="tab" href="#received" role="tab" aria-controls="received" aria-selected="true">Following (<span th:text="${followingCount}">0</span>)</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="sent-tab" data-bs-toggle="tab" href="#sent" role="tab" aria-controls="sent" aria-selected="false">Followers (<span th:text="${followersCount}">0</span>)</a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content mt-4" id="myTabContent">
+                                <!-- Received Requests Tab -->
+                                <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                                    <!-- Check if there are received requests -->
+                                    <div  th:if="${followingCount == 0}" class="text-center">
+                                    	<img src="/static/img/no-invitaions.png" class="img-fluid" alt="No Following found">
+                                        <p>No Following found.</p>
+                                    </div>
+                                    <div th:if="${followingCount > 0}"  th:each="user : ${following}" class="d-flex align-items-center justify-content-between">
+                                        <div class="received-content d-flex align-items-center">
+                                            <img th:src="${user.profileImage != null ? '/files/profileImage/' + user.userId : '/static/img/user.jpg'}" alt="" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+                                            <div class="content ms-3">
+                                            	<a th:href="@{/profile/{slug}(slug=${user.profileUrlSlug})}">
+                                                	<h6 class="mb-0" th:text="${user.firstName} + ' ' + ${user.lastName}"></h6>
+                                                </a>
+                                                <p th:text="${user.headline}"></p>
+                                            </div>
+                                        </div>
+                                             <button type="button" class="btn btn-success rounded-pill py-1" disabled><i class="fas fa-check me-2"></i> Following</button>                                     
+                                    </div>
+                                    <hr>
+                                </div>
+
+                                <!-- Sent Requests Tab -->
+                                <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                                    <!-- Check if there are sent requests -->
+                                    <div th:if="${followersCount == 0}" class="text-center">
+                                    	<img src="/static/img/no-invitaions.png" class="img-fluid" alt="No Connection Request">
+                                        <p>No followers found.</p>
+                                    </div>
+                                    <div th:if="${followersCount > 0}"  th:each="user : ${followers}" class="d-flex align-items-center justify-content-between">
+                                        <div class="received-content d-flex align-items-center">
+                                            <img th:src="${user.profileImage != null ? '/files/profileImage/' + user.userId : '/static/img/user.jpg'}" alt="" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+                                            <div class="content ms-3 ">
+                                                <h6 th:text="${user.firstName} + ' ' + ${user.lastName}"></h6>
+                                                <p th:text="${user.headline}"></p>
+                                            </div>
+                                        </div>
+
+                                       <button type="button" class="btn btn-success rounded-pill py-1" disabled><i class="fas fa-check me-2"></i> Following</button>
+                                    </div>
+								<hr>
+                                </div>
+                            </div>
+                        </div>               
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Main Section End  -->
+    </main>
+    <footer th:replace="~{layout :: page_footer}"></footer>
+
+</body>
+</html>

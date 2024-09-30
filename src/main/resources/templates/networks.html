@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+   
+</head>
+<style>
+    .menu-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+        color: grey;
+    }
+
+    .menu-item:hover {
+        background-color: #f0f0f0;
+        color: #000;
+    }
+    .btn-success:hover {
+    background-color: transparent !important;
+    color: var(--secondary) !important;
+    border: 1px solid var(--secondary);
+}
+</style>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+    	    <!-- Main Section Start  -->
+
+    <div class="container-fluid ">
+        
+       
+        <div class="container py-2 py-lg-4">
+            <div class="row g-lg-5">
+
+                <!-- Left Sidebar Start -->
+                <div class="col-lg-3 py-0">
+
+
+                    <!-- Manage Network Section Start -->
+                    <div class="row pt-2 shadow bg-white mb-2"
+                        style="border-radius: 10px;">
+                        <div class="container">
+
+                            <a class="d-flex justify-content-between text-dark p-3" data-bs-toggle="collapse"
+                                href="#collapseExample" role="button" aria-expanded="false"
+                                aria-controls="collapseExample">
+                                <span>Manage my network</span>
+                                <i class="fa fa-caret-down text-end"></i>
+                            </a>
+
+                            <div class="collapse" id="collapseExample">
+                                <div class="card-body">
+                                    <a href="/networks/connections" class="menu-item">
+                                        <span><i class="fa fa-user-plus me-2"></i> Connections</span>
+                                        <span th:text="${connectionCount}"></span>
+                                    </a>
+                                    <a href="/networks/people-follow/following" class="menu-item">
+                                        <span><i class="fa fa-user me-2"></i> Following & followers</span>
+                                    </a>
+                                    <a href="/articles" class="menu-item">
+                                        <span><i class="fa fa-newspaper me-2"></i> Articles</span>
+                                        <span th:text="${articleCount}"></span>
+                                    </a>
+                                    <a href="/events" class="menu-item">
+                                        <span><i class="fa fa-calendar me-2"></i> Event</span>
+                                        <span th:text="${eventCount}"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Manage Network Section End -->
+
+
+                </div>
+                <!-- Left Sidebar End -->
+
+                <!-- Right Content Start -->
+                <div class="col-lg-9 p-0">
+
+                    <!-- Manage Network Section Start -->
+                    
+                    <!--  Large Screen  -->
+                    <div class="row mb-lg-2 d-none d-lg-block d-md-none">
+                        <div class="col-12">
+                            <div class="mb-2">
+                                <div class="bg-white shadow p-4" style="border-radius: 10px;">
+
+                                    <!-- request item start  -->
+                                    <div class="request-item">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <div class="text">
+                                                <h5>Manage my Network</h5>
+                                            </div>
+                                            <a href="/networks/invitation-manager"><i class="fa fa-arrow-right text-dark"></i></a>
+                                        </div>
+                                        <div th:if="${#lists.isEmpty(incomingRequests)}">
+									        <p>No Connection Requests</p>
+									    </div>
+									    <div th:unless="${#lists.isEmpty(incomingRequests)}">
+	                                        <div th:each="request : ${incomingRequests}" class="request d-flex align-items-center justify-content-between">
+	                                            <div class="content d-flex align-items-center">
+	                                            	<img th:src="${request.user1.profileImage != null ? '/files/profileImage/' + request.user1.userId : '/static/img/user.jpg'}" alt="" class="img-fluid rounded-circle"
+	                                                style="width:50px; height:50px;">
+		                                            <div class="details ms-4">
+		                                                <h6 th:text="${request.user1.firstName} + ' ' + ${request.user1.lastName}"></h6>
+		                                                <small th:text="${request.user1.headline}"></small>
+		                                            </div>
+	                                            </div>
+	                                            <div class="buttons d-flex align-items-center">
+	                                            	<!-- Corrected Accept Button Form -->
+										            <form method="post" th:action="@{/connect/accept/{requestId}(requestId=${request.connectionId})}">
+										                <button type="submit" class="btn btn-success rounded-pill px-4" title="Accept">Accept</button>
+										            </form>
+										            <!-- Corrected Decline Button Form -->
+										            <form method="post" th:action="@{/connect/decline/{requestId}(requestId=${request.connectionId})}">
+										                <button type="submit" class="btn btn-danger rounded-pill px-4 ms-2" title="Decline">Decline</button>
+										            </form>
+	                                            </div>
+	
+	                                        </div>
+	                                     </div>
+
+                                    </div>
+                                    <hr>
+                                    <!-- request item end  -->
+									<div class="button text-center">
+					                    <a href="/networks/invitation-manager" class="text-danger mt-2">Show all</a>
+					                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+					<!--  Small Screen  -->
+                    <div class="row mb-lg-2 d-lg-none">
+                        <div class="col-12 ">
+                            <div class="mb-2">
+                                <div class="bg-white shadow p-4" style="border-radius: 10px;">
+
+
+                                   <!-- request item start  -->
+                                    <div class="request-item">
+                                        <div class="d-flex justify-content-between mb-4">
+                                            <div class="text">
+                                                <h5>Manage my Network</h5>
+                                            </div>
+                                            <a href="/networks/invitation-manager"><i class="fa fa-arrow-right text-dark"></i></a>
+                                        </div>
+                                        <div th:if="${#lists.isEmpty(incomingRequests)}">
+									        <p>No Connection Requests</p>
+									    </div>
+									    <div th:unless="${#lists.isEmpty(incomingRequests)}">
+	                                        <div  th:each="request : ${incomingRequests}" class="request d-flex align-items-center justify-content-between">
+	                                            
+	                                            <div class="content d-flex align-items-center">
+	                                            	<img th:src="${request.user1.profileImage != null ? '/files/profileImage/' + request.user1.userId : '/static/img/user.jpg'}" alt="" class="img-fluid rounded-circle"
+	                                                style="width:50px; height:50px;">
+		                                            <div class="details ms-4">
+		                                                <a th:href="@{/profile/{slug}(slug=${request.user1.profileUrlSlug})}">
+		                                                	<h6 th:text="${request.user1.firstName} + ' ' + ${request.user1.lastName}"></h6>
+		                                                </a>
+		                                                <small th:text="${request.user1.headline}"></small>
+		                                            </div>
+	                                            </div>
+	                                            <div class="buttons d-flex align-items-center">
+	                                            	 <!-- Corrected Accept Button Form -->
+										            <form method="post" th:action="@{/connect/accept/{requestId}(requestId=${request.connectionId})}">
+										                <button type="submit" class="btn btn-success rounded-circle" title="Accept"><i class="fa fa-check"></i></button>
+										            </form>
+										            <!-- Corrected Decline Button Form -->
+										            <form method="post" th:action="@{/connect/decline/{requestId}(requestId=${request.connectionId})}">
+										                <button type="submit" class="btn btn-danger rounded-circle ms-2" title="Decline"><i class="fa fa-times"></i></button>
+										            </form>
+	                                            </div>
+	
+	                                        </div>
+	                                    </div>
+
+                                    </div>
+                                    <hr>
+                                    <!-- request item end  -->
+									<div class="button text-center">
+					                    <a href="/networks/invitation-manager" class="text-danger mt-2">Show all</a>
+					                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Manage Network Section End -->
+
+                    <!-- Suggested Connections Start -->
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="mb-2">
+                                <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                                    <div class="pb-3 mb-2">
+                                        <h5 class="mb-0">People you may know</h5>
+                                    </div>
+                                    <div class="container">
+                                        <div class="row g-3">
+                                           <!-- Profile Card -->
+                                           
+										     <div th:if="${#lists.isEmpty(filteredOtherUsers)}">
+										         <p>No Users Available</p>
+										     </div>
+
+											<th:block th:if="${!#lists.isEmpty(filteredOtherUsers)}" th:each="user : ${filteredOtherUsers}">
+											    <div class="col-lg-3 col-md-4 col-sm-6">
+											        <div class="card">
+											            <div class="card-body text-center">
+											                <img th:src="${user.profileImage != null ? '/files/profileImage/' + user.userId : '/static/img/user.jpg'}" 
+											                     alt="Profile Picture" class="img-fluid rounded-circle mb-2" 
+											                     style="width:50px; height:50px;">
+											                <a class="text-dark" th:href="@{/profile/{slug}(slug=${user.profileUrlSlug})}">
+											                	<p class="card-title text-dark" th:text="${user.firstName} + ' ' + ${user.lastName}"></p>
+											                </a>
+											                <small th:text="${user.headline}"></small>
+											                <br>
+											                <th:block th:if="${userConnectionMap != null}">
+											                
+														    <th:block th:if="${userConnectionMap[user.userId] != null}">
+														        <th:block th:if="${userConnectionMap[user.userId].status == 'pending'}">
+														            
+														            <!-- Show Pending and Withdraw Options -->
+														            <button type="button" class="btn btn-outline-success rounded-pill px-4 mt-3" 
+														                    data-bs-toggle="modal" data-bs-target="#withdrawModal" 
+														                    th:data-user-id="${user.userId}">
+														                <i class="fa fa-clock ms-2"></i> Pending
+														            </button>
+														            
+														        </th:block>
+														        <th:block th:if="${userConnectionMap[user.userId].status != 'pending'}">
+														            <!-- Show Connect Option -->
+														            <form method="post" action="#" th:action="@{/connect/{userId}(userId=${user.userId})}">
+														                <button type="submit" class="btn btn-outline-danger rounded-pill px-4 mt-3">
+														                    Connect
+														                    <i class="fa fa-user-plus ms-2"></i>
+														                </button>
+														            </form>
+														        </th:block>
+														    </th:block>
+														    <th:block th:if="${userConnectionMap[user.userId] == null}">
+														        <!-- Show Connect Option if no connection exists -->
+														        <form method="post" action="#" th:action="@{/connect/{userId}(userId=${user.userId})}">
+														            <button type="submit" class="btn btn-outline-danger rounded-pill px-4 mt-3">
+														                Connect
+														                <i class="fa fa-user-plus ms-2"></i>
+														            </button>
+														        </form>
+														    </th:block>
+														    
+														</th:block>
+											
+											            </div>
+											        </div>
+											    </div>
+											</th:block>
+											
+											<!-- Withdraw Modal -->
+											<div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+											    <div class="modal-dialog" style="width:400px; border-radius:20px;">
+											        <div class="modal-content">
+											            <div class="modal-header">
+											                <h1 class="modal-title fs-5" id="withdrawModalLabel">Confirm Withdrawal</h1>
+											                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											            </div>
+											            <div class="modal-body">
+											                <p>Are you sure you want to withdraw your connection request?</p>
+											            </div>
+											            <div class="modal-footer">
+											                <form method="post" action="#" th:action="@{/connect/withdraw}">
+											                    <input type="hidden" name="userId" id="modalUserId" />
+											                    <button type="button" class="btn btn-outline-primary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+											                    <button type="submit" class="btn btn-outline-danger rounded-pill px-4">Withdraw</button>
+											                </form>
+											            </div>
+											        </div>
+											    </div>
+											</div>
+
+                                            
+                                 			
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Suggested Connections End -->
+
+                </div>
+                <!-- Right Content End -->
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main Section End  -->
+    </main>
+	<script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	        var withdrawButtons = document.querySelectorAll('button[data-bs-toggle="modal"]');
+	
+	        withdrawButtons.forEach(function(button) {
+	            button.addEventListener('click', function() {
+	                var userId = this.getAttribute('data-user-id');
+	                document.getElementById('modalUserId').value = userId;
+	            });
+	        });
+	    });
+	</script>
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>
+

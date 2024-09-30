@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="page_head">
+   <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>JobHive - Homepage</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="/static/img/icon.png" rel="icon">
+	
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Rubik:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/static/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/static/lib/animate/animate.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    
+    <!-- Include Froala Editor CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.10/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit1"></script>
+	<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2"></script>
+</head>
+<style>
+	.nav-item .badge {
+    font-size: 0.75rem;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+@media (max-width: 575px) {
+        .navbar-light .navbar-nav .nav-link {
+            margin-left: 5px;
+            font-size: 18px;
+        }
+
+        .navbar-light .navbar-nav .nav-link i {
+            font-size: 20px;
+        }
+
+        .navbar-light .dropdown-menu {
+            width: 250px; /* Adjust dropdown width as needed */
+        }
+
+        .navbar-light .dropdown-menu .dropdown-item {
+            font-size: 14px; /* Adjust dropdown item font size */
+        }
+
+        .navbar-light .navbar-nav .nav-link .badge {
+            font-size: 0.55rem; 
+            width: 12px; 
+            height: 12px; 
+        }
+
+        .navbar-light .navbar-brand h2 {
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .nav-item .badge {
+            font-size: 0.5rem; /* Smaller font size */
+            width: 10px; /* Smaller width */
+            height: 10px; /* Smaller height */
+            line-height: 10px; /* Adjust line-height to align text */
+        }
+
+        .navbar-light .navbar-nav .nav-link {
+            font-size: 16px; /* Adjust font size for links */
+        }
+
+        .navbar-light .navbar-nav .nav-link i {
+            font-size: 18px; /* Adjust icon size */
+        }
+
+        .navbar-light .dropdown-menu {
+            width: 200px; /* Adjust dropdown width for smaller screens */
+        }
+
+        .navbar-light .dropdown-menu .dropdown-item {
+            font-size: 12px; /* Adjust dropdown item font size */
+        }
+
+        .navbar-light .navbar-brand h2 {
+            font-size: 18px; /* Adjust brand font size */
+        }
+
+        .navbar-light .navbar-nav .nav-link .badge {
+            font-size: 0.4rem; /* Even smaller font size for very small screens */
+            width: 8px; /* Even smaller width */
+            height: 8px; /* Even smaller height */
+            line-height: 8px; /* Adjust line-height for text alignment */
+        }
+    }
+	
+</style>
+<body style="background-color: #f1f1f1;">
+    <div th:fragment="page_navbar">
+    	<!-- Spinner Start -->
+	    <div id="spinner"
+	        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+	        <div class="spinner"></div>
+	    </div>
+	    <!-- Spinner End -->
+	
+	    <!-- Navbar Start -->
+	    <!-- Large Screen  -->
+	    <div class="container-fluid position-relative p-0 d-none d-sm-none d-lg-block">
+	        <nav class="navbar navbar-expand-lg navbar-light bg-white px-5 py-2">
+	            <div class="container">
+	            	<a href="/home" class="navbar-brand p-0">
+		                <img src="/static/img/logo.png" alt="logo" width="120px">
+		            </a>
+		            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+		                <span class="fa fa-bars"></span>
+		            </button>
+		            <div class="collapse navbar-collapse" id="navbarCollapse">
+		                <div class="d-flex justify-content-between w-100">
+		                    <div class="navbar-nav mx-auto py-0">
+		                        <a href="/home" class="nav-item nav-link active" title="Home">
+		                            <i class="fa fa-home"></i>
+		                        </a>
+		                        <a href="/networks" class="nav-item nav-link" title="My Network">
+		                            <i class="fa fa-users"></i>
+		                        </a>
+		                        <a href="/jobs" class="nav-item nav-link" title="Jobs">
+		                            <i class="fa fa-briefcase"></i>
+		                        </a>
+		                        <a href="/messages" class="nav-item nav-link" title="Messaging">
+				                    <i class="fa fa-comment-dots"></i>
+				                    <span class="badge bg-danger position-absolute top-10 start-100 translate-middle p-1 rounded-circle">
+				                        <span th:text="${unreadMessagesCount}">0</span>
+				                    </span>
+				                </a>
+				                <a href="/notifications" class="nav-item nav-link position-relative" title="Notifications">
+				                    <i class="fa fa-bell"></i>
+				                    <span class="badge bg-danger position-absolute top-10 start-100 translate-middle p-1 rounded-circle">
+				                        <span th:text="${unreadNotificationsCount}">0</span>
+				                    </span>
+				                </a>
+		
+		                        <div class="nav-item dropdown">
+		                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+		                                <img  alt="profile-image" th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle" style="width:28px; height:28px">
+										
+										    
+		                            </a>
+		                            <div class="dropdown-menu m-0 border-0 p-2 shadow">
+		                                <div class="row align-items-center p-2">
+		                                    <div class="col-3">
+		                                     <img  alt="profile-image" class="img-fluid rounded-circle" th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}" style="width:60px; height:60px">									     
+										     
+		                                    </div>
+		                                    <div class="col-9">
+		                                        <h6 class="text-dark"><b th:text="${currentUser.firstName} + ' ' + ${currentUser.lastName}"></b></h6>
+		                                        <small class="text-secondary-subtle"
+		                                            style="font-size: 14px; line-height: 1.2px;" th:text="${currentUser.headline}"></small>
+		                                    </div>
+		                                </div>
+		                                <div class="row align-items-center mx-2">
+		                                    <div class="col-12 p-2">
+		                                    	<a th:href="@{/profile/{slug}(slug=${currentUser.profileUrlSlug})}" class="text-danger btn w-100 border border-danger rounded-pill m-0">
+		                                            View Profile
+		                                    	</a>
+		                                    </div>
+		                                </div>
+		
+		
+		                                <hr>
+		                                <div class="section-1">
+		                                    <h6 class="fw-bold ms-3">Account</h6>
+		                                    <a href="price.jsp" class="dropdown-item">Settings & Privacy</a>
+		                                    <a href="feature.jsp" class="dropdown-item">Help</a>
+		                                    <a href="feature.jsp" class="dropdown-item">Languages</a>
+		                                    <a href="feature.jsp" class="dropdown-item">Posts & Activity</a>
+		                                    <hr>
+		                                    <form action="/logout" method="get">
+		                                        <button type="submit" class="btn btn-danger w-100">Sign Out</button>
+		                                    </form>
+		                                </div>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="d-flex align-items-center justify-content-center">
+		                	<form method="GET" action="/search" class="input-group">
+			                    <div class="input-group">
+			                        <input type="search" class="form-control bg-transparent text-dark" name="query" placeholder="Search">
+			                        <button class="btn btn-danger px-2" type="submit"><i class="bi bi-search text-white"></i></button>
+			                    </div>
+		                    </form>
+		                </div>
+		            </div>
+	
+	            </div>
+	        </nav>
+	    </div>
+	    <!-- Small Screen -->
+		<div class="container-fluid p-0 d-lg-none d-sm-block">
+		    <div class="navbar-light bg-white py-2 px-2 d-flex justify-content-between align-items-center">
+		        <a href="/home" class="navbar-brand p-0">
+		             <img src="/static/img/logo.png" alt="logo" width="120px">
+		        </a>
+		        <div class="d-flex align-items-center">
+		            <a href="/home" class="nav-item" title="Home">
+		                <i class="fa fa-home"></i>
+		            </a>
+		            <a href="/networks" class="nav-item" title="My Network">
+		                <i class="fa fa-users"></i>
+		            </a>
+		            <a href="/jobs" class="nav-item" title="Jobs">
+		                <i class="fa fa-briefcase"></i>
+		            </a>
+		            <a href="/messages" class="nav-item" title="Messaging">
+		                 <i class="fa fa-comment-dots"></i>
+		                 <span class="badge bg-danger top-10 start-100 translate-middle p-1 rounded-circle">
+		                    <span th:text="${unreadMessagesCount}">0</span>
+		                 </span>
+		             </a>
+		             <a href="/notifications" class="nav-item" title="Notificati
+		             ons">
+		                 <i class="fa fa-bell"></i>
+		                 <span class="badge bg-danger top-10 start-100 translate-middle p-1 rounded-circle">
+		                     <span th:text="${unreadNotificationsCount}">0</span>
+		                 </span>
+		             </a>
+		
+		           
+		        </div>
+		        <div class="nav-item dropdown">
+		            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+		                <img alt="profile-image" th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle" style="width:28px; height:28px">
+		            </a>
+		            <div class="dropdown-menu m-0 border-0 p-2 shadow">
+		                <div class="row align-items-center p-2">
+		                    <div class="col-3">
+		                        <img alt="profile-image" th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle" style="width:60px; height:60px">
+		                    </div>
+		                    <div class="col-9">
+		                        <h6 class="text-dark"><b th:text="${currentUser.firstName} + ' ' + ${currentUser.lastName}"></b></h6>
+		                        <small class="text-secondary-subtle" style="font-size: 14px; line-height: 1.2px;" th:text="${currentUser.headline}"></small>
+		                    </div>
+		                </div>
+		                <div class="row align-items-center mx-2">
+		                    <div class="col-12 p-2">
+		                        <a th:href="@{/profile/{slug}(slug=${currentUser.profileUrlSlug})}" class="text-danger btn w-100 border border-danger rounded-pill m-0">
+		                            View Profile
+		                        </a>
+		                    </div>
+		                </div>               
+		                <hr>
+		                <div class="section-1">
+		                    <h6 class="fw-bold ms-3">Account</h6>
+		                    <a href="price.jsp" class="dropdown-item">Settings & Privacy</a>
+		                    <a href="feature.jsp" class="dropdown-item">Help</a>
+		                    <a href="feature.jsp" class="dropdown-item">Languages</a>
+		                    <a href="feature.jsp" class="dropdown-item">Posts & Activity</a>
+		                    <hr>
+		                    <form action="/logout" method="get">
+		                        <button type="submit" class="btn btn-danger w-100">Sign Out</button>
+		                    </form>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+
+	    <!-- Navbar End -->
+    
+    </div>
+    
+
+    
+   <footer th:fragment="page_footer">
+	   <!-- Footer Start -->
+	    <div class="container-fluid text-secondary-subtle">
+	        <div class="container text-center">
+	            <div class="row">
+	                <div class="col-12">
+	                    <div class="d-flex align-items-center justify-content-center" style="height: 75px;">
+	                        <p class="mb-0">&copy; 2024 <a class="text-dark" href="/home">JobHive</a> |
+	                            All
+	                            Rights Reserved |
+	                            Designed by <a class="text-danger" href="">Tech Buddies</a>
+	                        </p>
+	                        
+	                    </div>
+	                </div>
+	                <div class="col-12 mb-5">
+	                	<div id="google_translate_element"></div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+	    <!-- Footer End -->
+		<script type="text/javascript">
+			function googleTranslateElementInit1() {
+			  new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element');
+			}
+		</script>
+		<script type="text/javascript">
+			function googleTranslateElementInit2() {
+			  new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate');
+			}
+		</script>
+	
+	    <!-- Back to Top -->
+	    <a href="#" class="btn btn-lg btn-danger btn-lg-square rounded back-to-top"><i class="bi bi-arrow-up"></i></a>
+	
+		<script type="text/javascript" defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit1"></script>
+		<script type="text/javascript" defer src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit2"></script>
+	    <!-- JavaScript Libraries -->
+	    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	    <script src="/static/lib/wow/wow.min.js"></script>
+	    <script src="/static/lib/easing/easing.min.js"></script>
+	    <script src="/static/lib/waypoints/waypoints.min.js"></script>
+	    <script src="/static/lib/counterup/counterup.min.js"></script>
+	    <script src="/static/lib/owlcarousel/owl.carousel.min.js"></script>
+	
+	    <!-- Template Javascript -->
+	    <script src="/static/js/main.js"></script>
+    	
+    	<!-- Include Froala Editor JS -->
+    	<script src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/4.0.10/js/froala_editor.pkgd.min.js"></script>
+   
+    </footer>
+
+</body>
+</html>

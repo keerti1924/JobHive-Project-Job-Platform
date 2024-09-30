@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+	
+</head>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <script>
+    
+    function addSkill() {
+        const skillInput = document.getElementById('skill-input');
+        const skillsContainer = document.getElementById('skills-container');
+        const skillsField = document.getElementById('skills');
+
+        if (skillInput.value.trim() !== '') {
+            const skill = skillInput.value.trim();
+            const skillElement = document.createElement('div');
+            skillElement.textContent = skill;
+            skillsContainer.insertBefore(skillElement, skillInput);
+            skillInput.value = '';
+
+            // Update hidden field with comma-separated skills
+            const existingSkills = skillsField.value.split(', ').filter(s => s.trim() !== '');
+            existingSkills.push(skill);
+            skillsField.value = existingSkills.join(', ');
+        }
+       
+    }
+</script>
+    <div class="container-fluid">
+        <div class="container py-5 d-flex justify-content-center max-vh-100">
+           <form action="/jobs/post-job/step2" method="post" class="border p-4 rounded shadow" style="max-width: 900px; width: 100%;">
+                <h4 class="fw-normal">Review Job Description</h4>
+                <hr>
+    			<input type="hidden" name="userId" value="${currentUser.userId}"> 
+                <div class="row">
+                    <div class="form-group mb-4 col-lg-6">
+                        <label for="title">Job Title <sup>*</sup></label>
+                        <input type="text" class="form-control mt-2" name="title" placeholder="Add the job title" th:value="${job.title}" required>
+                    </div>
+                    <div class="form-group mb-4 col-lg-6">
+                        <label for="company">Company Name <sup>*</sup></label>
+                        <input type="text" class="form-control mt-2" name="company" placeholder="Add the company name" th:value="${job.company}" required>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="form-group mb-4 col-lg-6">
+                        <label for="workplace">Workplace Type <sup>*</sup></label>
+                        <select name="workplace" id="workplace" class="form-control mt-2" required>
+                            <option value="On-site">On-site</option>
+                            <option value="Hybrid">Hybrid</option>
+                            <option value="Remote">Remote</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-4 col-lg-6">
+                        <label for="location">Job Location <sup>*</sup></label>
+                        <input type="text" class="form-control mt-2" id="location" name="location" placeholder="Add the job location" required>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="form-group mb-4 col-12">
+                        <label for="job_type">Job Type <sup>*</sup></label>
+                        <select name="jobType" id="jobType" class="form-control mt-2">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Temporary">Temporary</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+    
+                <div class="row">
+                    <div class="form-group mb-4 col-12">
+                        <label for="description">Job Description <sup>*</sup></label>
+                        <textarea name="description" id="froala-editor" class="form-control mt-2" rows="6" placeholder="Add the job description here" required></textarea>
+                    </div>
+                </div>
+    
+                <div class="row">
+                   <div class="form-group mb-4 col-12">
+                        <label for="skills">Skills <sup>*</sup></label>
+                        <div id="skills-container">
+                            <input type="text" class="form-control mt-2" id="skill-input" placeholder="Add a skill">
+                        </div>
+                        <button type="button" class="btn btn-danger mt-2" onclick="addSkill()">Add Skill</button>
+                        <input type="hidden" name="skills" id="skills" required>
+                    </div>
+                </div>             
+    
+                <div class="button d-flex justify-content-end">
+                    <button type="submit" class="btn btn-danger px-4 rounded-pill mt-2 py-1">Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <footer th:replace="~{layout :: page_footer}"></footer>
+	<script>
+       new FroalaEditor('#froala-editor');
+    </script>
+</body>
+</html>

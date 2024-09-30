@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+</head>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+
+	<div class="container py-2 py-lg-4">
+            
+         <!-- Activity Section Start  -->
+         <div class="row p-4 shadow bg-white mb-2" >
+         	<h4>Activity</h4>
+	        <small><a href="/networks/people-follow/following" th:text="${followersCount} + ' followers' "></a></small>
+         </div>
+	    <div class="row pt-2 shadow bg-white mb-2" >
+	        <div class="container">
+	            <div class="posts p-lg-3 p-2">
+	                
+					<!-- Posts -->
+	                <h5 class="mt-2">Posts</h5>
+	                
+	                <!-- Check if posts are available -->
+	                <div th:if="${#lists.isEmpty(posts)}">
+	                    <p>No posts available</p>
+	                </div>
+	
+	                <div th:each="post : ${posts}">
+	                    <a href="/home" class="text-muted">
+	                        <div class="post">
+	                            <!-- Display the user's full name -->
+	                            <small style="font-size:12px;" th:text="${post.user.firstName + ' ' + post.user.lastName} + ' posted this  • ' + ${timeUtils.formatRelativeTime(post.timestamp)}"></small>
+	                            
+	                            <!-- Post content -->
+	                            <div class="post-content d-flex align-items-center mt-2">
+	                                <!-- Display the post image -->
+	                                <img th:if="${post.image != null}"
+	                                     th:src="@{/files/image/{postId}(postId=${post.postId})}"
+	                                     alt="Post Image" class="img-fluid rounded me-2" style="width:80px; height:50px">
+	                                <!-- Post description -->
+	                                <small class="text-dark" th:text="${timeUtils.truncateToWords(event.description, 30)}"></small>
+	                            </div>
+	                            
+	                            <!-- Post likes and comments -->
+	                            <div class="content d-flex justify-content-between mt-2">
+	                                <small>
+	                                    <i class="fa fa-thumbs-up"></i> <span th:text="${post.likedByUsers.size()}"></span> Likes
+	                                </small>
+	                                <small class="me-3"><span th:text="${post.comments.size()}"></span> comments</small>
+	                            </div>
+	                        </div>
+	                    </a>
+	                    <hr>
+	                </div>
+
+	            </div>
+	        </div>
+	    </div>
+	    
+	    <div class="row pt-2 shadow bg-white mb-2" >
+	        <div class="container">
+	            <div class="events p-lg-3 p-2">
+	            	 <!-- Events Section -->
+					<h5 class="mt-2">Events</h5>
+					
+					<!-- Check if events are available -->
+					<div th:if="${#lists.isEmpty(events)}">
+					    <p>No events available</p>
+					</div>
+					
+					<div th:if="${!#lists.isEmpty(events)}" th:each="event : ${events}">
+						<!-- Display the user's full name -->
+	                  <small style="font-size:12px;" th:text="${event.user.firstName + ' ' + event.user.lastName} + ' posted this  • ' + ${timeUtils.formatRelativeTime(event.timestamp)}"></small>
+					    <a th:href="@{/event-details/{eventId}(eventId=${event.eventId})}" class="text-muted">
+					        <div class="event-content d-flex align-items-center mt-2">
+								<!-- Display the post image -->
+						        <img th:if="${event.image != null}" th:src="@{/files/images/{eventId}(eventId=${event.eventId})}"
+						             alt="Post Image" class="img-fluid rounded me-2" style="width:80px; height:50px">
+					        	<div class="event">
+						            <!-- Display the event title -->
+						            <h6 class="mb-0" th:text="${event.event_name}"></h6>
+						            
+						            <!-- Event date -->
+						            <small style="font-size:12px;" th:text="${event.date} + ' • ' + ${event.time} "></small>
+						            (<small style="font-size:12px;" th:text="${event.mode}"></small>)
+						        </div>
+					        </div>
+					         <!-- Event description -->
+						     <small class="text-muted mt-3" th:text="${timeUtils.truncateToWords(event.description, 30)}"></small>
+						     <p class="mb-0" th:if="${event.mode == 'Online'}"><i class="fas fa-link me-2 text-muted"></i> <a th:href="${event.link}" target="_blank" th:text="${event.link}" ></a></p>
+                             <p class="mb-0" th:if="${event.mode == 'Offline'}"><i class="fas fa-location-dot me-2 text-muted"></i> <small th:text="${event.address}" ></small></p>
+					    </a>
+					    <hr>
+					</div>
+	            </div>
+	        </div>
+	    </div>
+	    
+	     <div class="row pt-2 shadow bg-white mb-2" >
+	        <div class="container">
+	            <div class="articles p-lg-3 p-2">
+	            	 <!-- Articles Section -->
+					<h5>Articles</h5>
+					
+					<!-- Check if articles are available -->
+					<div th:if="${#lists.isEmpty(articles)}">
+					    <p>No articles available</p>
+					</div>
+					
+					<div th:if="${!#lists.isEmpty(articles)}" th:each="article : ${articles}">
+						<!-- Display the user's full name -->
+	                  <small style="font-size:12px;" th:text="${article.author.firstName + ' ' + article.author.lastName} + ' posted this  • ' + ${timeUtils.formatRelativeTime(article.publicationDate)}"></small>
+					    <a th:href="@{/articles/article/{id}(id=${article.id})}" class="text-muted">
+					        <div class="article d-flex align-items-center mt-2">
+								<!-- Display the post image -->
+						        <img th:src="@{/files/articleImage/{articleId}(articleId=${article.id})}"
+						             alt="Post Image" class="img-fluid rounded me-2" style="width:80px; height:50px">
+					        	<div class="event">
+						            <!-- Display the event title -->
+						            <h6 class="mb-0" th:text="${article.title}"></h6>
+						            <!-- Event description -->
+						     		<small class="text-muted mt-3" th:utext="${timeUtils.truncateToWords(article.content, 30)}"></small> </a>
+						         </div>
+					        </div>
+					         
+					    <hr>
+					</div>
+	                
+	            </div>
+	        </div>
+	    </div>
+	                
+	    <!-- Activity Section End  -->
+           
+     </div>
+       
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+</head>
+<style>
+    .nav-tabs .nav-link {
+        border: none;
+        outline: none;
+        box-shadow: none;
+        color: inherit;
+        font-weight: 500;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: green !important;
+        border-bottom: 1px solid green;
+    }
+
+    .nav-tabs {
+        border-bottom: 1 px solid #000;
+    }
+    .btn-success:hover {
+    background-color: transparent !important;
+    color: var(--secondary) !important;
+    border: 1px solid var(--secondary);
+}
+</style>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+        <!-- Main Section Start  -->
+        <div class="container-fluid">
+
+            <div class="container py-2 py-lg-4">
+                <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                    <div class="row">
+                        <div class="col-12 mt-2">
+                            <h5 class="fw-normal mb-3">Manage Connections</h5>
+                            <!-- Tabs -->
+                            <ul class="nav nav-tabs mb-2" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="received-tab" data-bs-toggle="tab" href="#received" role="tab" aria-controls="received" aria-selected="true">Received (<span th:text="${incomingRequestCount}">0</span>)</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="sent-tab" data-bs-toggle="tab" href="#sent" role="tab" aria-controls="sent" aria-selected="false">Sent (<span th:text="${outgoingRequestCount}">0</span>)</a>
+                                </li>
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content mt-4" id="myTabContent">
+                                <!-- Received Requests Tab -->
+                                <div class="tab-pane fade show active" id="received" role="tabpanel" aria-labelledby="received-tab">
+                                    <!-- Check if there are received requests -->
+                                    <div th:if="${#lists.isEmpty(incomingRequests)}" class="text-center">
+                                    	<img src="/static/img/no-invitaions.png" class="img-fluid" alt="No Connection Request">
+                                        <p>No received requests.</p>
+                                    </div>
+                                    <div th:each="request : ${incomingRequests}" class="d-flex align-items-center justify-content-between">
+                                        <div class="received-content d-flex align-items-center" th:if="${request.user1 != null}">
+                                            <img th:src="${request.user1.profileImage != null ? '/files/profileImage/' + request.user1.userId : '/static/img/user.jpg'}" alt="" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+                                            <div class="content ms-3">
+                                                <h6 th:text="${request.user1.firstName} + ' ' + ${request.user1.lastName}"></h6>
+                                                <p th:text="${request.user1.headline}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="buttons ms-lg-5 ms-2 d-flex align-items-center">
+                                            <form method="post" th:action="@{/connect/accept/{requestId}(requestId=${request.connectionId})}">
+                                                <button type="submit" class="btn btn-success rounded-pill py-0">Accept</button>
+                                            </form>
+                                            <form method="post" th:action="@{/connect/decline/{requestId}(requestId=${request.connectionId})}">
+                                                <button type="submit" class="btn btn-danger rounded-pill py-0 ms-2">Decline</button>
+                                            </form>
+                                        </div>
+                                        
+                                    </div>
+                                    <hr>
+                                </div>
+
+                                <!-- Sent Requests Tab -->
+                                <div class="tab-pane fade" id="sent" role="tabpanel" aria-labelledby="sent-tab">
+                                    <!-- Check if there are sent requests -->
+                                    <div th:if="${#lists.isEmpty(outgoingRequests)}" class="text-center">
+                                    	<img src="/static/img/sent-invitations.png" class="img-fluid" alt="No Connection Request">
+                                        <p>No sent requests.</p>
+                                    </div>
+                                    <div th:each="request : ${outgoingRequests}" class="d-flex align-items-center justify-content-between">
+                                        <div class="received-content d-flex align-items-center" th:if="${request.user2 != null}">
+                                            <img th:src="${request.user2.profileImage != null ? '/files/profileImage/' + request.user2.userId : '/static/img/user.jpg'}" alt="" style="width: 50px; height: 50px;" class="img-fluid rounded-circle">
+                                            <div class="content ms-3 ">
+                                                <h6 th:text="${request.user2.firstName} + ' ' + ${request.user2.lastName}"></h6>
+                                                <p th:text="${request.user2.headline}"></p>
+                                            </div>
+                                        </div>
+                                        <div class="buttons ms-2 ms-lg-5">
+											 <button type="submit" class="btn btn-danger rounded-pill py-0" data-bs-toggle="modal" data-bs-target="#withdrawModal" th:data-user-id="${request.user2.userId}">Withdraw</button>
+                                        </div>
+                                        
+											
+                                        
+                                    </div>
+                                    
+                                    <!-- Withdraw Modal -->
+											<div class="modal fade" id="withdrawModal" tabindex="-1" aria-labelledby="withdrawModalLabel" aria-hidden="true">
+											    <div class="modal-dialog" style="width:400px; border-radius:20px;">
+											        <div class="modal-content">
+											            <div class="modal-header">
+											                <h1 class="modal-title fs-5" id="withdrawModalLabel">Confirm Withdrawal</h1>
+											                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											            </div>
+											            <div class="modal-body">
+											                <p>Are you sure you want to withdraw your connection request?</p>
+											            </div>
+											            <div class="modal-footer">
+											                <form method="post" th:action="@{/connect/withdraw}">
+											                    <input type="hidden" name="userId" id="modalUserId"/>
+											                    <button type="button" class="btn btn-outline-primary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+											                    <button type="submit" class="btn btn-outline-danger rounded-pill px-4">Withdraw</button>
+											                </form>
+											            </div>
+											        </div>
+											    </div>
+											</div>
+											
+											
+											<hr>
+                                </div>
+                            </div>
+                        </div>               
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Main Section End  -->
+    </main>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var withdrawButtons = document.querySelectorAll('button[data-bs-toggle="modal"]');
+
+        withdrawButtons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                var userId = this.getAttribute('data-user-id');
+                document.getElementById('modalUserId').value = userId;
+            });
+        });
+    });
+</script>
+    <footer th:replace="~{layout :: page_footer}"></footer>
+
+</body>
+</html>

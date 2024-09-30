@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<body>
+  <div th:replace="~{layout :: page_navbar}"></div>
+	<main>
+	<div class="container-fluid ">	   
+        <div class="container py-2 py-lg-4">
+            <div class="row g-lg-5 g-2">
+                <div class="col-12">
+
+                    <div class="mb-5 mt-4">
+                        <div class="main-content">
+                            <h1 class="fw-normal">Industry Insights and Career Growth Articles</h1>
+                            <p>Welcome to our Articles page, where professionals from diverse industries come together to share their expertise, ideas, and perspectives. Whether you're seeking career advice, leadership insights, or the latest trends shaping your industry, our articles provide valuable knowledge to help you grow both personally and professionally. Stay informed, stay inspired, and advance your career by exploring the latest thought leadership from experts around the world.</p>
+                        </div>
+                    </div>
+					 <!-- Check if articles list is empty -->
+                    <div th:if="${#lists.isEmpty(articles)}" class="alert alert-info" role="alert">
+                        No articles found. Be the first to create one!
+                        <a href="/articles/new" class="mt-2 btn btn-danger px-4 py-1">Create an Article</a>
+                    </div>
+                    <!-- Display articles if available -->
+                     <div th:if="${!#lists.isEmpty(articles)}">
+	                    <div th:each="article : ${articles}" class="article-area mb-4">
+	                      <div class="row">
+	                      	<div class="col-lg-3 mb-2">
+	                        	<img th:src="@{/files/articleImage/{articleId}(articleId=${article.id})}" alt="" class="img-fluid me-4" width="300px" style="border-radius: 10px;">
+	                        </div>
+	                        <div class="col-lg-9">
+		                        <div class="content">
+		                            <a th:href="@{/articles/article/{id}(id=${article.id})}"><h4 class="fw-normal" th:text="${article.title}"></h4></a>
+		                            <small th:text="${timeUtils.formatRelativeTime(article.publicationDate)}"></small>
+		                            <p class="text-muted" th:utext="${article.content}"></p>
+		                            <div class="d-flex align-items-center">
+		                                <!-- Check if the profile image exists -->
+										<img th:if="${article.author.profileImage != null}" 
+										     th:src="@{/files/profileImage/{userId}(userId=${article.author.userId})}" 
+										     alt="" class="img-fluid rounded-circle" style="width:30px; height:30px;">
+										<!-- Show default image if profile image does not exist -->
+										<img th:if="${article.author.profileImage == null}" 
+										     src="/static/img/user.jpg" 
+										     alt="" class="img-fluid rounded-circle" style="width:30px; height:30px;">
+	
+		                                <small><a th:href="@{/profile/{slug}(slug=${article.author.profileUrlSlug})}" class="text-muted ms-2" th:text="${article.author.firstName} + ' ' + ${article.author.lastName}"></a></small>
+		                            </div>
+		                        </div>
+	                        </div>
+	                      </div>
+	                    </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+    </main>
+    
+	<script>
+	// Function to strip HTML tags and truncate text
+	function truncateHTMLText(selector, maxWords) {
+	    document.querySelectorAll(selector).forEach(elem => {
+	        // Get inner HTML and create a temporary element to extract plain text
+	        let tempElem = document.createElement('div');
+	        tempElem.innerHTML = elem.innerHTML;
+	        let textContent = tempElem.textContent || tempElem.innerText || "";
+
+	        // Split the plain text into words
+	        let words = textContent.split(' ');
+
+	        // Check if it exceeds the maxWords
+	        if (words.length > maxWords) {
+	            let truncatedText = words.slice(0, maxWords).join(' ') + '...';
+	            // Set truncated text back into the element without breaking HTML
+	            elem.innerHTML = truncatedText;
+	        }
+	    });
+	}
+
+	document.addEventListener('DOMContentLoaded', () => {
+	    truncateHTMLText('.truncate', 300); // Set your desired word limit here
+	});
+	</script>
+
+    
+    <footer th:replace="~{layout :: page_footer}"></footer>
+  </body>
+  </html>

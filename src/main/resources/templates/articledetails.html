@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+    <!-- Main Section Start  -->
+   	
+   	<div class="container-fluid ">	   
+        <div class="container py-2 py-lg-4">
+            <div class="row g-lg-5 g-2">
+                <!-- Left Side Bar -->
+                <div class="col-lg-4">
+                    <div class="row mb-lg-2 g-2">
+                        <div class="col-12">
+                         	<div class="bg-white shadow p-4" style="border-radius: 10px;">
+                                <div class="left-content">
+                                   <div class="content">
+                                       <p class="mb-0">Create an article on Jobhive and invite your network</p>
+                                       <a class="btn btn-outline-danger rounded-pill py-1 mt-2 ms-2" title="Add Article" href="/articles/new">Create Article</a>
+                                    </div>                                      
+                                 </div>                                   
+                             </div>
+                         </div>
+                         <div class="col-12">
+                            <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                                <div class="heading d-flex justify-content-between mb-3">
+                                    <h4 class="mb-2">Other articles for you</h4>
+                                    <a href="/articles" class="text-danger">See all</a>
+                                </div>
+                                <div class="articles">
+                                	<div th:if="${articles.isEmpty()}">
+                                    	<p>No articles Available</p>
+                                	</div>
+                                	<div th:if="${!articles.isEmpty()}">
+	                                    <div th:each="article : ${articles}" class="d-flex align-items-center border-bottom py-2">
+	                                        <img th:src="@{/files/articleImage/{articleId}(articleId=${article.id})}" alt="" width="80px" class="img-fluid" style="border-radius: 10px;">
+	                                        <div class="content ms-3" style="line-height: normal;">
+	                                            <a th:href="@{/articles/article/{articleId}(articleId=${article.id})}" class="text-dark" style="text-decoration: none;">
+									                <small class="article-name" th:text="${article.title}"></small>
+									            </a><br>
+									            <a th:href="@{/profile/{slug}(slug=${article.author.profileUrlSlug})}" class="text-muted">
+	                                            	<small style="font-size: 14px;" th:text="'-' + ${article.author.firstName} + ' ' + ${article.author.lastName}"></small>
+	                                       		</a>
+	                                        </div>
+	                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar  -->
+                <div class="col-lg-8 p-0">
+                    <!-- Top articles Section Start -->
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class="card bg-white shadow mb-2" style="border-radius: 10px;">
+                                <img th:src="@{/files/articleImage/{articleId}(articleId=${article.id})}" alt="" style="border-radius: 10px 10px 0px 0px; height: 450px;">
+                                <div class="content p-4">
+                                    <h4 class="mb-0" th:text="${article.title}"></h4>
+                                    <p class="mb-0"><small th:text="${timeUtils.formatRelativeTime(article.publicationDate)}"></small></p>
+                                    <div class="d-flex align-items-center mt-2">
+		                                <!-- Check if the profile image exists -->
+										<img th:if="${article.author.profileImage != null}" 
+										     th:src="@{/files/profileImage/{userId}(userId=${article.author.userId})}" 
+										     alt="" class="img-fluid rounded-circle" style="width:30px; height:30px;">
+										<!-- Show default image if profile image does not exist -->
+										<img th:if="${article.author.profileImage == null}" 
+										     src="/static/img/user.jpg" 
+										     alt="" class="img-fluid rounded-circle" style="width:30px; height:30px;">
+	
+		                                <small class="ms-2" >Written by <a th:href="@{/profile/{slug}(slug=${article.author.profileUrlSlug})}" th:text="${article.author.firstName} + ' ' + ${article.author.lastName}"></a></small>
+		                            </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="card bg-white shadow p-4" style="border-radius: 10px;">
+                            	<h5 class="text-dark mb-2">Description</h5>
+                                <small th:utext="${article.content}"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Top articles Section End -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+   	
+    <!-- Main Section End  -->
+    </main>
+
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>
+

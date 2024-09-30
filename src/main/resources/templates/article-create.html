@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<style>
+    .large-input {
+        font-size: 30px; 
+        padding: 10px; 
+    }
+    input:focus,
+    textarea:focus {
+        border: none !important;
+        box-shadow: none !important; 
+        outline: none !important;
+    }
+    .preview {
+        min-height: 400px;
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+        background-color: #ebeef0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ccc;
+    }
+    .preview img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .drag-area {
+        text-align: center;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .drag-area p {
+        margin: 0;
+    }
+    .drop-zone {
+       cursor: pointer;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    .drop-zone img {
+        display: block;
+        margin-bottom: 10px; /* Add space below the image */
+    }
+</style>
+
+<body>
+
+    <div th:replace="~{layout :: page_navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="container py-2 py-lg-4 mt-4">
+            <div class="row g-lg-5 g-2">
+                <div class="col-12 mt-4">
+                    <form action="/articles/create" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="userId" th:value="${currentUserId}" />
+                        <div class="preview" id="preview">
+                            <div id="drag-area" class="drag-area drop-zone p-2" ondrop="drop(event)" ondragover="allowDrop(event)">
+                                <img id="image-preview" src="" alt="Image Preview" style="display: none;">
+                                <img id="default-image" src="/static/img/image.png" alt="Image Preview" width="100px">
+                                <p>Simply drag your image file from your computer and drop it into the designated area.</p>
+                                <label class="btn btn-danger btn-file rounded-pill px-4 mt-2">
+                                    Upload from computer
+                                    <input type="file" id="media-file-input" name="image" class="custom-file-input form-control" onchange="previewImage(this)" required>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="content-area mt-4">
+                            <input type="text" name="title" class="form-control border-0 large-input mb-2" placeholder="Title" required>
+                            <textarea name="content" id="froala-editor" class="form-control border-0" rows="10" placeholder="Write your content here ...." required></textarea>
+                            <div class="button d-flex justify-content-end mt-4">
+                                <button type="submit" class="btn btn-danger rounded-pill px-5">Publish</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{layout :: page_footer}"></footer>
+
+    <script>
+        // Handle image preview for file input
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var imgPreview = document.getElementById('image-preview');
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block'; // Show the image preview
+                    document.getElementById('default-image').style.display = 'none'; // Hide the default image
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Handle drag over event
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        // Handle file drop event
+        function drop(event) {
+            event.preventDefault();
+            var files = event.dataTransfer.files;
+            if (files.length > 0) {
+                var file = files[0];
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var imgPreview = document.getElementById('image-preview');
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block'; // Show the image preview
+                    document.getElementById('default-image').style.display = 'none'; // Hide the default image
+                };
+                reader.readAsDataURL(file);
+                document.getElementById('media-file-input').files = event.dataTransfer.files; // Update file input
+            }
+        }
+        
+      	//editor
+        new FroalaEditor('#froala-editor');
+    </script>
+</body>
+</html>

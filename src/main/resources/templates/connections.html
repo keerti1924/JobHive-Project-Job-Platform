@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+</head>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+        <!-- Main Section Start  -->
+            <div class="container-fluid">
+            
+			
+        <div class="container py-2 py-lg-4">
+            <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                <div class="row">
+                    <div class="col-12 mt-2">
+                        <h5 class="fw-normal mb-4" th:text="${connectionCount} + ' Connections'"></h5>
+                        <div class="sorting d-flex align-items-center">
+                            <span>Sort By :</span>
+                            <div class="dropdown">
+                                <a class="btn" href="#" role="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <b>Recently Added</b> <i class="fa fa-caret-down me-2"></i>
+                                </a>
+
+                                <ul class="dropdown-menu shadow border-0">
+                                    <li><a class="dropdown-item" href="#">
+                                            Recently Added</a></li>
+                                    <li><a class="dropdown-item" href="#">
+                                            First Name</a></li>
+                                    <li><a class="dropdown-item" href="#">
+                                            Last Name</a></li>
+                                    
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="search" class="form-control" placeholder="Search By Name....">
+                        </div>
+                        <hr>
+                        
+                         <!-- Check if there are no connections -->
+                           	<div th:if="${connections.size()} == 0" class="text-center">
+							    <img src="/static/img/no-connections.png" alt="Image" class="img-fluid">
+							    <p>No connections available</p>
+							</div>
+
+                            <!-- Display connections -->
+                            <div th:if="${connections.size()} > 0">
+                                <div th:each="connection : ${connections}" class="received-content d-flex align-items-center justify-content-between py-2 border-bottom">
+                                    <div class="info d-flex align-items-center">
+                                        <img th:src="${(currentUser.userId == connection.user1.userId) 
+									                ? (connection.user2.profileImage != null ? '/files/profileImage/' + connection.user2.userId : '/static/img/user.jpg')
+									                : (connection.user1.profileImage != null ? '/files/profileImage/' + connection.user1.userId : '/static/img/user.jpg')}" 
+									     alt="Profile Image" 
+									     style="width: 60px; height: 60px;" 
+									     class="img-fluid rounded-circle">
+
+                                        <div class="content ms-lg-3 ms-2">
+                                            <h6 class="mb-0">
+							                    <a class="text-dark" th:href="@{/profile/{slug}(slug=${connection.user1.userId == currentUser.userId ? connection.user2.profileUrlSlug : connection.user1.profileUrlSlug})}">
+							                        <span th:text="${connection.user1.userId == currentUser.userId} ? ${connection.user2.firstName} + ' ' + ${connection.user2.lastName} : ${connection.user1.firstName} + ' ' + ${connection.user1.lastName}"></span>
+							                    </a>
+							                </h6>
+							                <small th:text="${connection.user1.userId == currentUser.userId} ? ${connection.user2.headline} : ${connection.user1.headline}"></small>
+							            </div>
+                                    </div>
+                                    <div class="buttons ms-2 ms-lg-5 d-flex align-items-center">
+                                        <!-- Calculate the correct userId based on the connection and currentUser -->
+										<span th:with="messageUserId=${connection.user1.userId == currentUser.userId ? connection.user2.userId : connection.user1.userId}">
+										    <a th:href="@{/messages/{userId}(userId=${messageUserId})}" class="btn btn-danger rounded-pill py-0">Message</a>
+										</span>
+
+                                        <div class="dropdown">
+                                            <a class="ms-2 text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-ellipsis-v"></i>
+                                            </a>
+
+                                            <ul class="dropdown-menu shadow border-0">
+                                                <li>
+                                                    <form method="post" th:action="@{/connect/remove}">
+                                                        <input type="hidden" name="connectionId" th:value="${connection.connectionId}" />
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fa fa-trash me-2"></i> Remove Connection
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>               
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Main Section End  -->
+    </main>
+
+    <footer th:replace="~{layout :: page_footer}"></footer>
+
+</body>
+</html>

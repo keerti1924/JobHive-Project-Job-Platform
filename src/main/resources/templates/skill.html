@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+</head>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+
+	<div class="container py-2 py-lg-4">
+            <div class="row">
+                <div class="col-12 mt-lg-0 mt-2">
+                    <!-- Tab content -->
+                    <div class="tab-content bg-white border" style="border-radius: 10px;">
+                        <div class="education-content">
+                            <div class="header d-flex justify-content-between align-items-center border-bottom">
+                                <h4 class="fw-normal p-4">Skills</h4>
+							                <div class="icon">
+							                    <i class="fa fa-plus me-4 text-secondary-subtle" data-bs-toggle="modal" data-bs-target="#skilladdModal"></i>
+							                    <!-- Skill add modal start -->
+							                    <div class="modal fade" id="skilladdModal" tabindex="-1" aria-labelledby="skilladdModalLabel" aria-hidden="true">
+							                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+							                            <div class="modal-content">
+							                                <div class="modal-header">
+							                                    <h5 class="modal-title" id="skilladdModalLabel">Add Skill</h5>
+							                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							                                </div>
+							                                <div class="modal-body">
+							                                    <form action="/profile/addSkill" method="post">
+							                                        <input type="hidden" name="userId" value="${currentUser.userId}">
+							                                        <div class="form-input mb-2">
+							                                            <label for="skill">Skill <sup>*</sup></label>
+							                                            <input type="text" name="skill" id="skill" class="form-control" placeholder="Skill (Ex: Project Management)" required>
+							                                        </div>
+							                                        <div class="modal-footer">
+							                                            <button type="submit" class="btn btn-danger rounded-pill px-4">Save</button>
+							                                        </div>
+							                                    </form>
+							                                </div>
+							                            </div>
+							                        </div>
+							                    </div>
+							                </div>
+							          
+                            </div>
+                            
+                            <div th:if="${#lists.isEmpty(skills)}" class="p-4">
+								<p>Add Your New Skills</p>
+							</div>
+										
+                            <div th:if="${!#lists.isEmpty(skills)}" th:each="skill : ${skills}" class="education-item d-flex justify-content-between align-items-center border-bottom">
+                                <h6 class="mb-0 ms-4
+                                " th:text="${skill.skill}"></h6>
+                                <div class="buttons me-4">
+                                    <!-- Edit Button -->
+                                    <button class="btn" data-bs-toggle="modal"  th:data-bs-target="'#editSkillModal_' + ${skill.id}">
+                                        <i class="fa fa-pencil-alt text-primary"></i>
+                                    </button>
+                                    <!-- Delete Button -->
+                                    <button class="btn" data-bs-toggle="modal"  th:data-bs-target="'#deleteSkillModal_' + ${skill.id}">
+                                        <i class="fa fa-trash-alt text-danger"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Edit skill Modal -->
+                                <div class="modal fade" th:id="'editSkillModal_' + ${skill.id}" tabindex="-1"
+                                    aria-labelledby="editSkillModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="editSkillModalLabel">Edit skill
+                                                </h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                               <form action="/profile/updateSkills" method="post">
+                                                	<input type="hidden" name="id" id="editId" th:value="${skill.id}">
+							                                        <div class="form-input mb-2">
+							                                            <label for="skill">Skill <sup>*</sup></label>
+							                                            <input type="text" name="skill" id="skill" class="form-control" placeholder="Skill (Ex: Project Management)" th:value="${skill.skill}" required>
+							                                        </div>
+							                                        <div class="modal-footer">
+							                                            <button type="submit" class="btn btn-danger rounded-pill px-4">Save</button>
+							                                        </div>
+												</form>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete education Modal -->
+                                <div class="modal fade" th:id="'deleteSkillModal_' + ${skill.id}" tabindex="-1"
+                                    aria-labelledby="deleteSkillModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteSkillModalLabel">Delete
+                                                    education</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete this skill?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form action="/profile/deleteSkill" method="post">
+                                                    <input type="hidden" name="id" id="deleteId" th:value="${skill.id}">
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Cancel</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>

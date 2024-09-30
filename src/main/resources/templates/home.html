@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}">
+   
+</head>
+<style>
+	 .hashtag {
+        color: #33adff;
+    }
+</style>
+<body>
+<script>
+    let mediaFile = null; // Global variable to store the selected media file
+
+    // Function to preview the image and store the media file from the media modal
+    function previewImage(input) {
+        var file = input.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var imagePreview = document.getElementById('media-preview');
+                var fileName = document.getElementById('file-name');
+                
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                fileName.textContent = file.name;
+
+                // Store file information for later use
+                mediaFile = file;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Function to handle file input directly in the create post modal
+    function updateFilePreview(input) {
+        var file = input.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var imagePreview = document.getElementById('createpost-image-preview');
+                var fileName = document.getElementById('createpost-file-name');
+                
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                fileName.textContent = file.name;
+
+                // Update the global media file variable
+                mediaFile = file;
+                
+             // Set the file to the hidden input
+                const hiddenFileInput = document.getElementById('hidden-file-input');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                hiddenFileInput.files = dataTransfer.files;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    //document name show
+    function updateFileName(input) {
+        // Get the file input element
+        var fileInput = document.getElementById('file-input1');
+        
+        // Get the file name
+        var fileName = fileInput.files.length > 0 ? fileInput.files[0].name : 'No file chosen';
+        
+        // Update the file name display
+        document.getElementById('createpost-file-name').textContent = fileName;
+    }
+
+    // Optional: To clear the file name display when the modal is hidden
+    document.getElementById('createpost').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('createpost-file-name').textContent = '';
+    });
+    
+
+ 		// Function to prepare the file before showing the create post modal
+	   function showCreatePostModal() {
+	    const mediaPreview = document.getElementById('createpost-image-preview');
+	    const mediaFileName = document.getElementById('createpost-file-name');
+	    const hiddenFileInput = document.getElementById('hidden-file-input');
+	
+	    // If the media file is set from the Media Modal
+	    if (mediaFile) {
+	        // Show the image in the Create Post Modal
+	        const reader = new FileReader();
+	        reader.onload = function (e) {
+	            mediaPreview.src = e.target.result;
+	            mediaPreview.style.display = 'block';
+	        };
+	        reader.readAsDataURL(mediaFile);
+	        
+	        mediaFileName.textContent = mediaFile.name;
+	
+	        // Create a new DataTransfer object to assign the file to the hidden input
+	        const dataTransfer = new DataTransfer();
+	        dataTransfer.items.add(mediaFile);
+	        hiddenFileInput.files = dataTransfer.files;  // Assign the file to the hidden input
+	
+	        // Reset mediaFile to avoid showing the same file if switching between modals
+	        mediaFile = null;
+	    } else {
+	        // Clear the preview if no media file is available
+	        mediaPreview.style.display = 'none';
+	        mediaFileName.textContent = '';
+	        hiddenFileInput.value = '';  // Clear the hidden input
+	    }
+	
+	    // Hide the Media Modal if it's open
+	    const mediaModal = bootstrap.Modal.getInstance(document.getElementById('mediaModal'));
+	    if (mediaModal) {
+	        mediaModal.hide();
+	    }
+	
+	    // Show the Create Post Modal
+	    const createPostModal = new bootstrap.Modal(document.getElementById('createpost'));
+	    createPostModal.show();
+	}
+
+ 
+ 
+ // post description
+
+    function toggleReadMore(event) {
+        event.preventDefault();
+        const shortText = document.getElementById("shortText");
+        const fullText = document.getElementById("fullText");
+        const readMoreLink = document.getElementById("readMore");
+
+        if (shortText.style.display === "none") {
+            shortText.style.display = "block";
+            fullText.style.display = "none";
+            readMoreLink.textContent = "Read More";
+        } else {
+            shortText.style.display = "none";
+            fullText.style.display = "block";
+            readMoreLink.textContent = "Show Less";
+        }
+    }
+ 
+
+    //event details
+    
+        function toggleEventMode(mode) {
+            document.getElementById('onlineLink').classList.toggle('d-none', mode !== 'Online');
+            document.getElementById('offlineAddress').classList.toggle('d-none', mode !== 'Offline');
+        }
+
+        function previewEventImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('imagePreview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+        
+
+</script>
+
+
+
+  <div th:replace="~{layout :: page_navbar}"></div>
+    <main>
+        <!-- Main Section Start  -->
+
+    <div class="container-fluid  p-0" data-wow-delay="0.1s">
+        <div class="container py-2 py-lg-4">
+            <div class="row g-md-5 g-lg-3">
+
+                <!-- Left Sidebar Start -->
+                <div class="col-lg-3 col-md-4 mb-2 p-0">
+                    <!-- Search Form Start -->
+                    <div class="row mb-2 d-lg-none" data-wow-delay="0.1s">
+	                    <form method="GET" action="/search" class="input-group">
+	                        <div class="input-group">
+	                            <input type="text" class="form-control p-3" name="query" placeholder="Search....">
+	                            <button class="btn btn-danger px-3" type="submit"><i class="bi bi-search"></i></button>
+	                        </div>
+	                    </form>
+                    </div>
+                    <!-- Search Form End -->
+					
+					
+                    <!-- Profile Start -->
+                    <div class="mb-2 " data-wow-delay="0.1s">
+                        <!-- Profile Card Start -->
+                        <div class="mb-2" data-wow-delay="0.1s">
+                            <div class=" bg-white shadow text-center" style="border-radius: 10px;">
+                            
+                                
+                                
+                               <!-- Background Image -->
+								<div class="profile-card-header" 
+								     th:style="'background-image: url(' + (${currentUser.backgroundImage != null ? '/files/backgroundImage/' + currentUser.userId : '/static/img/background.png'}) + ')'">
+								
+								    <!-- Profile Image -->
+								    <img alt="Profile Image" 
+								         th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}" 
+								         class="profile-img img-fluid" />
+								</div>
+															
+								
+                                <div class="profile-card-body mt-4 pt-4 p-2">
+                                    <h5><a th:href="@{/profile/{slug}(slug=${currentUser.profileUrlSlug})}" class="text-dark" th:text="${currentUser.firstName} + ' ' + ${currentUser.lastName}">
+                                    </a></h5>
+                                    <small th:text="${currentUser.headline}"></small>
+                                	
+                                </div>
+                                <hr>
+                                <div class="profile-links text-center">
+                                    <a th:href="@{/profile/{slug}(slug=${currentUser.profileUrlSlug})}" class="px-4"><small class="text-danger">View Profile</small></a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Profile Card End -->
+                    </div>
+                    <!-- Profile End -->
+
+                    <!-- Post Job Start -->
+                    <div class="mb-2" data-wow-delay="0.1s">
+                        <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                            <h5 class="mb-2">Hire Top Talent Easily</h5>
+                            <small>Connect with skilled professionals on JobHive. Post your job openings and find the
+                                perfect candidates quickly. Our platform makes hiring efficient and
+                                effective.</small><hr>
+                            <div class="button text-center">
+                            	<a href="/jobs/post-job/step1" class="text-danger">Post a job</a>
+                            </div>
+                         </div>
+                    </div>
+                    <!-- Post Job End -->
+                    
+                    <!-- Find Job Start -->
+					<div class="row mb-2 d-none d-md-block d-lg-none">
+					    <div class="col-12">
+					        <!-- Find Job Start -->
+		                    <div class=" mb-2" data-wow-delay="0.1s">
+		                        <div class="bg-white shadow p-4" style="border-radius: 10px;">
+		                            <h5 class="mb-2">Find Your Dream Job Today</h5>
+		                            <small>Unlock your potential with JobHive. Browse thousands of job listings
+		                                tailored to your
+		                                skills and preferences. Join our community of professionals and take the next step in
+		                                your career journey.</small><br><br>
+		                                <hr>
+		                            <div class="button text-center">
+		                            	<a href="/jobs" class="btn text-danger">Browse Jobs</a>
+		                            </div>
+		                        </div>
+		                    </div>
+
+					    </div>
+					</div>
+		            <!-- Find Job End -->
+		            <div class="row mt-4 d-none d-md-block d-lg-none">
+		            	<div class="col-12">
+		                    <div class="d-flex align-items-center justify-content-center" style="height: 75px;">
+		                        <small class="mb-0">&copy; 2024 <a class="text-dark" href="/home">JobHive</a> |
+		                            All
+		                            Rights Reserved |
+		                            Designed by <a class="text-danger" href="">Tech Buddies</a>
+		                        </small>
+		                        
+		                    </div>
+			             </div>
+			             <div class="col-12 mb-5">
+			                <div id="google_translate"></div>
+			            </div>
+				     </div>
+
+                </div>
+                <!-- Left Sidebar End -->
+
+                <!-- Center Content Start -->
+                <div class="col-lg-6 col-md-8 py-0">
+
+                    <!-- Create Post Section Start -->
+                    <div class="row pt-2 mx-lg-1  shadow bg-white mb-2" data-wow-delay="0.1s"
+                        style="border-radius: 10px;">
+
+                        <div class="col-md-12">
+                            <div class="create-post d-flex justify-content-between p-lg-3 p-2">
+								
+                                <img alt="Profile Picture" th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}"  class="profile-img img-fluid rounded-circle" style="width:70px; height:60px;">
+
+                                <!-- Button trigger create post modal -->
+                                <input type="button"
+                                    class="btn rounded-pill text-secondary-subtle ms-2 ms-lg-4 ps-lg-5 ps-4 text-start bg-transparent border border-secondary-subtle w-100"
+                                    data-bs-toggle="modal" data-bs-target="#createpost" value="Create a Post">
+
+
+								<!-- Create Post Modal -->
+								<div class="modal fade" id="createpost" tabindex="-1" aria-labelledby="postModalLabel" aria-hidden="true">
+								    <div class="modal-dialog">
+								        <div class="modal-content">
+								            <div class="modal-header">
+								                <div class="header d-flex justify-content-between">
+								                    <img  alt="profile-image" width="50px" class="img-fluid rounded-circle me-3" th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}">
+								                    <div class="heading">
+								                        <h1 class="modal-title fs-5" id="postModalLabel" th:text="${currentUser.firstName} + ' ' + ${currentUser.lastName}"></h1>
+								                        <small>Post to Anyone</small>
+								                    </div>
+								                </div>
+								                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								            </div>
+								            <form action="/createPost" method="post" enctype="multipart/form-data">
+											    <div class="modal-body">
+											        <textarea name="description" id="description" placeholder="Share your thoughts..." class="form-control border-0" rows="5" cols="10" required></textarea>
+											        <div class="icons text-end mt-2">
+											            <!-- Hidden input to store media file from media modal -->
+											            <input type="file" id="hidden-file-input" class="d-none" name="media">
+											            
+											            <!-- Existing file input for direct file selection in create post modal -->
+											            <input type="file" id="file-input" class="file-input d-none" name="media" onchange="updateFilePreview(this)">
+											            <!-- Image preview for create post modal -->
+											            <img id="createpost-image-preview" src="" alt="Image Preview" style="display:none; max-width: 100%; margin-bottom: 10px;" />
+											            <p id="createpost-file-name" class="ms-2"></p>
+											            
+											            <label for="file-input" class="file-label">
+											                <i class="far fa-image"></i>
+											            </label>
+											            
+											            
+											            <input type="file" id="file-input1" class="file-input d-none" name="document" title="Add a Document" onchange="updateFileName(this)">
+											            <label for="file-input1" class="file-label">
+											                <i class="far fa-newspaper"></i>
+											            </label>
+											        </div>
+											    </div>
+											    <div class="modal-footer">
+											        <button type="submit" class="btn btn-danger rounded-pill px-4">Post</button>
+											    </div>
+											</form>
+								        </div>
+								    </div>
+								</div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 text-end mb-2">
+                            <!-- Media Button trigger modal -->
+                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#mediaModal"
+                                title="Add Media">
+                                <img src="/static/img/media.png" alt="Media" class="img-fluid" width="30px">
+                            </button>
+
+                            <!-- Article Button trigger modal -->
+                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                title="Add Article">
+                                <a href="/articles/new">
+                                    <img src="/static/img/article.png" alt="Article" class="img-fluid" width="25px">
+                                </a>
+                            </button>
+
+                            <!-- Event Button trigger modal -->
+                            <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#eventModal"
+                                title="Add Event">
+                                <img src="/static/img/event.png" alt="Event" class="img-fluid" width="30px">
+                            </button>
+
+		                   <!-- Media Modal -->
+							<div class="modal fade" id="mediaModal" tabindex="-1" aria-labelledby="mediaModalLabel" aria-hidden="true">
+							    <div class="modal-dialog">
+							        <div class="modal-content">
+							            <div class="modal-header">
+							                <h1 class="modal-title fs-4" id="mediaModalLabel">Editor</h1>
+							                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							            </div>
+							            <div class="modal-body bg-light d-flex align-items-center justify-content-center">
+							                <div class="p-5 text-center">
+											    <img id="media-preview" src="" alt="Image Preview" style="display:none; max-width: 100%; margin-bottom: 10px;" />
+											    <span id="file-name" class="ms-2"></span>
+											    <h4>Select files to begin</h4>
+											    <p>Share images in your post.</p>
+											    <label class="btn btn-danger btn-file">
+											        Upload Image
+											        <input type="file" id="media-file-input" name="media" class="custom-file-input form-control" onchange="previewImage(this)" required>
+											    </label>
+											</div>
+							            </div>
+							            <div class="modal-footer">
+										    <button type="button" class="btn btn-danger px-4 rounded-pill" onclick="showCreatePostModal()">Next</button>
+										</div>
+							        </div>
+							    </div>
+							</div>
+
+
+                           <!-- Event Modal -->
+							<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+							    <div class="modal-dialog">
+							        <div class="modal-content">
+							            <div class="modal-header">
+							                <h1 class="modal-title fs-5" id="eventModalLabel">Create an Event</h1>
+							                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							            </div>
+							            <div class="modal-body text-start">
+							                <div class="container mt-2">
+							                    <form action="/createEvent" method="post" enctype="multipart/form-data">
+							                        <input type="hidden" name="userId" th:value="${currentUser.userId}">
+							                         <div class="form-group my-3">
+							                            <img id="imagePreview" src="" alt="Image Preview" style="max-width: 100%; display: none;" />
+							                        </div>
+							                        <div class="form-group mt-3">
+							                            <label for="eventImage">Upload Image</label>
+							                            <input type="file" class="form-control" id="eventImage" name="eventImage" onchange="previewEventImage(event)" required>
+							                        </div>
+							                        <div class="form-group mt-3">
+							                            <label for="eventName">Event Name</label>
+							                            <input type="text" class="form-control" id="eventName" name="eventName" placeholder="Event name" required>
+							                        </div>
+							                        <div class="form-group mt-3">
+							                            <label for="eventDate">Start Date</label>
+							                            <input type="date" class="form-control" id="eventDate" name="eventDate" required>
+							                        </div>
+							                        <div class="form-group mt-3">
+							                            <label for="eventTime">Start Time</label>
+							                            <input type="time" class="form-control" id="eventTime" name="eventTime" required>
+							                        </div>
+							                        <div class="form-group mt-3">
+							                            <label>Event Mode</label>
+							                            <div class="form-check">
+							                                <input class="form-check-input" type="radio" name="eventMode" id="online" value="Online" onclick="toggleEventMode(this.value)" required>
+							                                <label class="form-check-label" for="online">Online</label>
+							                            </div>
+							                            <div class="form-check">
+							                                <input class="form-check-input" type="radio" name="eventMode" id="offline" value="Offline" onclick="toggleEventMode(this.value)">
+							                                <label class="form-check-label" for="offline">Offline</label>
+							                            </div>
+							                        </div>
+							                        <div class="form-group mt-3 d-none" id="onlineLink">
+							                            <label for="eventLink">Event Link</label>
+							                            <input type="url" class="form-control" id="eventLink" name="eventLink" placeholder="Enter online event link">
+							                        </div>
+							                        <div class="form-group mt-3 d-none" id="offlineAddress">
+							                            <label for="eventAddress">Event Address</label>
+							                            <input type="text" class="form-control" id="eventAddress" name="eventAddress" placeholder="Enter offline event address">
+							                        </div>
+							                        <div class="form-group mt-3">
+							                            <label for="eventDescription">Event Description</label>
+							                            <textarea class="form-control" id="description" name="eventDescription" rows="3" placeholder="Event description" required></textarea>
+							                        </div>
+							                        
+							                        <div class="modal-footer">
+							                            <button type="submit" class="btn btn-danger px-4 rounded-pill">Create Event</button>
+							                        </div>
+							                    </form>
+							                </div>
+							            </div>
+							        </div>
+							    </div>
+							</div>
+
+
+
+                            
+                        </div>
+
+                    </div>
+                    <!-- Create Post Section End -->
+
+                    <!-- Post Section Start -->
+                    <hr>
+                    
+                    <div class="row mx-lg-1 shadow bg-white mb-2" data-wow-delay="0.1s" style="border-radius: 10px;" th:if="${#lists.isEmpty(posts)}">
+					     <div class="text-center p-4">
+					     	 <img src="/static/img/no-post.png" alt="No Posts" class="img-fluid">
+					         <p>No posts available</p>
+					     </div>
+					</div>
+
+					<div class="post-content" th:if="${!#lists.isEmpty(posts)}">
+					
+						<div class="row mx-lg-1 shadow bg-white mb-2" data-wow-delay="0.1s" style="border-radius: 10px;"  th:each="post : ${posts}">
+						    <div class="post-card">
+						        <div class="post-header d-flex align-items-center">
+						            
+									<!-- Display user profile image or default image if not available -->
+									<img th:src="${post.user.profileImage != null ? '/files/profileImage/' + post.user.userId : '/static/img/user.jpg'}" 
+									     alt="Profile Picture"
+									     class="profile-img rounded-circle"
+									     style="width: 50px; height: 50px;">
+
+									     
+						            <div class="user-info ms-3">
+						            
+						            
+						            <a th:href="@{/profile/{slug}(slug=${post.user.profileUrlSlug})}">
+						                <h6 class="m-0" th:text="${post.user.firstName} + ' ' + ${post.user.lastName}">
+						                    <span class="text-muted" th:text="${post.user.pronouns}"></span>
+						                </h6>
+						             </a>
+						                <small class="text-muted m-0" th:text="${post.user.headline}"></small>
+						                <small class="text-muted" th:text="${post.formattedTimestamp}"></small>
+						            </div>
+						          <div class="icon ms-auto mb-auto" th:if="${post.user.userId != currentUserId}">
+								    <form method="post" th:action="@{/networks/follow}">
+								        <input type="hidden" name="currentUserId" th:value="${currentUserId}" />
+								        <input type="hidden" name="targetUserId" th:value="${post.user.userId}" />
+								        <button type="submit" 
+										        class="btn btn-sm rounded-pill px-3 py-1"
+										        th:classappend="${followingUserIds != null && followingUserIds.contains(post.user.userId) ? 'btn-success' : 'btn-danger'}">
+										    <i class="fas me-1" 
+										       th:classappend="${followingUserIds != null && followingUserIds.contains(post.user.userId) ? 'fa-check' : 'fa-plus'}"></i>
+										    <span th:text="${followingUserIds != null && followingUserIds.contains(post.user.userId) ? 'Following' : 'Follow'}"></span>
+										</button>
+
+								    </form>
+								</div>
+
+
+						        </div>
+							       <div class="post-content mt-2">
+									    <small style="font-size: 15px;" th:text="${post.description.length() > 100 ? #strings.substring(post.description, 0, 100) + '...' : post.description}" id="shortText" th:if="${post.description.length() > 100}"></small>
+									    <small style="font-size: 15px; display:none;" th:utext="${post.description}" id="fullText" th:if="${post.description.length() > 100}"></small>
+									    
+									    <!-- If description is less than or equal to 100 characters, show it without read more functionality -->
+									    <small style="font-size: 15px;" th:utext="${post.description}" th:if="${post.description.length() <= 100}"></small>
+									    
+									    <!-- Read More link appears only if the description is more than 100 characters -->
+									    <a style="font-size: 15px;" href="#" id="readMore" th:if="${post.description.length() > 100}" onclick="toggleReadMore(event)" class="text-danger">Read More</a>
+									</div>
+								</div>
+						        <div class="post-image">
+						            
+						            <div class="media mb-2">
+						            	<div th:if="${post.image != null}">
+								            <img th:src="@{/files/image/{postId}(postId=${post.postId})}" alt="Post Media" style="max-width: 100%;"/>
+								        </div>
+						                <div th:if="${post.document != null}">
+									        <iframe th:src="@{/files/document/{postId}(postId=${post.postId})}" 
+									                width="100%" 
+									                height="500px" 
+									                style="border: none;">
+									        </iframe>
+									    </div>
+						            </div>
+						         
+						        </div>
+						        <div class="d-flex justify-content-between mb-0 pb-0">
+								    <p>
+						                <i class="fas fa-thumbs-up" th:classappend="${likedPosts[post.postId]} ? ' text-danger' : ''"></i>
+						                 <span class="like-count" th:text="${likeCounts[post.postId]}"></span>
+						            </p>
+    								<p class="btn" data-bs-toggle="collapse" th:attr="data-bs-target='#collapseComments_' + ${post.postId}" aria-expanded="false" aria-controls="collapseExample">
+								        <span class="comment-count" th:text="${#lists.size(post.comments)}">0</span> Comments
+								    </p>
+								</div>
+								<hr>
+						        <div class="post-actions d-flex justify-content-around mb-2">
+									 <form method="post" th:action="@{/likePost}">
+						                <input type="hidden" name="postId" th:value="${post.postId}" />
+						                <button class="btn" type="submit" th:if="${!likedPosts[post.postId]}">
+						                    <i class="fas fa-thumbs-up"></i> Like
+						                </button>
+						            </form>
+						            <form method="post" th:action="@{/unlikePost}">
+						                <input type="hidden" name="postId" th:value="${post.postId}" />
+						                <button class="btn" type="submit" th:if="${likedPosts[post.postId]}">
+						                    <i class="fas fa-thumbs-down"></i> Unlike
+						                </button>
+						            </form>
+								    
+								    <button class="btn" type="button" data-bs-toggle="collapse" th:attr="data-bs-target='#collapseComments_' + ${post.postId}"  aria-expanded="false" aria-controls="collapseComments">
+								        <i class="fas fa-comment"></i> Comment
+								    </button>
+						            <form action="" method="post">
+						                
+						                <button class="btn"><i class="fas fa-share"></i> Repost</button>
+						            </form>
+						            <form action="" method="post">
+						                
+						                <button class="btn"><i class="fas fa-paper-plane"></i> Send</button>
+						            </form>
+						        </div>
+						        <!-- Comment Collapse -->
+						        <div class="row collapse mt-3" th:attr="id='collapseComments_' + ${post.postId}">
+						            <div class="card border-0">
+						                <div class="card-body d-flex align-items-center">
+						                   <img th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle me-3" style="width:50px; height:50px;" alt="">
+									
+						                    <form th:action="@{/addComment}" method="post" >
+						                    	 <input type="hidden" name="postId" th:value="${post.postId}" />
+								                <div class="d-flex align-items-center justify-content-between">
+								                    <input type="text" name="content" class="form-control ps-4 rounded-pill" style="width: 100%;" placeholder="Add a Comment...." required>
+								                    <button type="submit" class="btn btn-danger rounded-pill ms-4 px-4">Post</button>
+								                </div>
+								            </form>
+						                </div>
+						               
+						                
+						                <div class="comment mb-2" th:each="comment : ${post.comments}" th:if="${comment.parentComment == null}">
+						                    <div class="bg-light p-2" style="border-radius:10px;">
+						                    	<div class="notification-content d-flex align-items-center justify-content-between mt-2">
+							                        <div class="d-flex align-items-center">
+							                          <img th:src="${comment.user.profileImage != null ? '/files/profileImage/' + comment.user.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle me-3" style="width:50px; height:50px;" alt="">
+							                            <div class="content">
+							                                <h6 class="mb-0" th:text="${comment.user.firstName} + ' ' + ${comment.user.lastName}"></h6>
+							                                <small th:text="${comment.formattedTimestamp}"></small>
+							                            </div>
+							                        </div>
+							                       
+							                        <div class="dropdown" th:if="${currentUser.userId == comment.user.userId}">
+							                            <a class="btn" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							                                <i class="fa fa-ellipsis-v px-2"></i>
+							                            </a>
+							                            <ul class="dropdown-menu shadow border-0">
+										                    <li><a class="dropdown-item text-muted" href="#" data-bs-toggle="modal" data-bs-target="#editCommentModal"><i class="fa fa-edit"></i> Edit Comment</a></li>
+										                    <li><a class="dropdown-item text-muted" href="#" data-bs-toggle="modal" data-bs-target="#deleteCommentModal"><i class="fa fa-trash"></i> Delete Comment</a></li>
+										                </ul>
+							                        </div>
+							                        
+							                    </div>
+							                    <div class="comment-text px-2 ms-5">
+											        <span th:text="${comment.commentText}"></span>
+											    </div>
+						                    </div>
+						                    <div class="comment-button">
+									            <div class=" p-2 ms-5 d-flex align-items-center">
+									            	<form th:action="@{/likeComment(comment.commentId)}" method="post" class="me-2">
+												    <input type="hidden" name="commentId" th:value="${comment.commentId}" />
+												    <button type="submit" class="btn p-0 m-0" style="font-size:15px"
+												        th:classappend="${currentUserId != null && comment.likes.contains(currentUser) ? 'text-danger' : 'text-muted'}">
+												        <span th:text="${comment.likeCount}">0</span> Likes
+												    </button>
+												</form>
+									            | <span class="m-0 ms-2" style="font-size:15px">
+									            	<a href="#" data-bs-toggle="collapse" th:attr="data-bs-target='#collapseReply' + ${comment.commentId}" aria-expanded="false" aria-controls="collapseReply">
+									            		<span class="ms-2" th:text="${comment.replies.size()}"></span>
+									            		 Reply 
+									            	</a>
+									           	 </span>
+									            </div>
+									         </div>
+									         
+									          
+									           	 
+									           	<!-- Reply Collapse -->
+									           	 
+									           	 <div class="row collapse" th:id="'collapseReply' + ${comment.commentId}">
+										            <div class="card border-0">
+										            	
+										                <div class="card-body">
+										                	<div class="replies ms-5" th:if="${comment.replies.size() > 0}">
+														        <div class="reply" th:each="reply : ${comment.replies}">
+														            <!-- Similar structure for each reply -->
+														            <div class=" bg-light p-2 mb-2" style="border-radius:10px;">
+														            	<div class="reply-content d-flex align-items-center justify-content-between mt-2">
+															                <div class="d-flex align-items-center">
+															                   <img th:src="${reply.user.profileImage != null ? '/files/profileImage/' + reply.user.userId : '/static/img/user.jpg'}" class="img-fluid rounded-circle me-3" style="width:50px; height:50px;" alt=""> 
+															                    <div class="content">
+															                        <h6 class="mb-0" th:text="${reply.user.firstName} + ' ' + ${reply.user.lastName}"></h6>
+															                        <small th:text="${reply.formattedTimestamp}"></small>
+															                    </div>
+															                </div>
+														            	</div>
+															            <div class="comment-text px-2 ms-5">
+															                <span th:text="${reply.commentText}"></span>
+															            </div>
+														            </div>
+														        </div>
+														    </div>
+										                    <div class=" d-flex align-items-center mt-2">
+										                    	<img th:src="${currentUser.profileImage != null ? '/files/profileImage/' + currentUser.userId : '/static/img/user.jpg'}"  class="img-fluid rounded-circle me-4" style="width:50px; height:50px;" alt="">
+											                    <form th:action="@{/replyToComment}" method="post" >
+											                    	<input type="hidden" name="commentId" th:value="${comment.commentId}" />
+													                <div class="d-flex align-items-center justify-content-between">
+													                    <input type="text" name="replyContent" class="form-control ps-4 rounded-pill" style="width: 100%;" placeholder="Add a Reply...." required>
+													                    <button type="submit" class="btn btn-danger rounded-pill ms-4 px-4">Reply</button>
+													                </div>
+													            </form>
+										                    </div>
+										                </div>
+									        		</div>
+									        	</div>
+									        
+						                
+						                 <!-- Edit Comment Modal -->
+										<div class="modal fade" th:id="editCommentModal" tabindex="-1" aria-labelledby="editCommentModalLabel" aria-hidden="true">
+										  <div class="modal-dialog">
+										    <div class="modal-content">
+										      <div class="modal-header">
+										        <h5 class="modal-title" id="editCommentModalLabel">Edit Comment</h5>
+										        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										      </div>
+										      <div class="modal-body">
+										        <form th:action="@{/editComment}" method="post">
+								                    <input type="hidden" name="commentId" th:value="${comment.commentId}" />
+								                    <div class="mb-3">
+								                        <textarea class="form-control" name="content" rows="3" th:text="${comment.commentText}" required></textarea>
+								                    </div>
+								                    <button type="submit" class="btn btn-danger rounded-pill px-4">Save changes</button>
+								                </form>
+										      </div>
+										    </div>
+										  </div>
+										</div>
+						                
+						                <!-- Delete Comment Modal -->
+									    <div class="modal fade" id="deleteCommentModal" tabindex="-1" aria-labelledby="deleteCommentModalLabel" aria-hidden="true">
+									        <div class="modal-dialog">
+									            <div class="modal-content">
+									                <div class="modal-header">
+									                    <h5 class="modal-title" id="deleteCommentModalLabel">Delete Comment</h5>
+									                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+									                </div>
+									                <div class="modal-body">
+									                    Are you sure you want to delete this comment?
+									                </div>
+									                <div class="modal-footer">
+									                    <form th:action="@{/deleteComment}" method="post">
+										                    <input type="hidden" name="commentId" th:value="${comment.commentId}" />
+										                    <button type="submit" class="btn btn-danger">Delete</button>
+										                </form>
+									                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+									                </div>
+									            </div>
+									        </div>
+									    </div>
+						                
+						               
+						               
+						                
+						            </div>
+						        </div>
+						    </div>
+						</div>
+						
+					</div>
+
+                 <!-- Post Section End -->
+
+                </div>
+                <!-- Center Content End -->
+
+                <!-- Right Sidebar Start -->
+                <div class="col-lg-3 p-0 col-md-12 d-none d-lg-block">
+
+                  <!-- Article Section Start -->
+                    <div class="row mb-2">
+                        <div class="col-12">
+                            <div class=" mb-2" data-wow-delay="0.1s">
+                                <div class="bg-white shadow p-4" style="border-radius: 10px;">
+                                    <h3 class="mb-2">JobHive Articles</h3>
+                                    <p style="font-size: 20px;">Top Articles</p>
+                                    
+                                    <div th:if="${#lists.isEmpty(articles)}">
+                                    	No articles found. Be the first to create one!
+				                        <p><a href="/articles/new" class="mt-4 rounded-pill btn btn-danger px-4 py-1">Create an Article</a><p>
+				                    </div>
+								
+									<div th:if="${!#lists.isEmpty(articles)}">
+	                                    <div class="item-1 mb-3 d-flex align-items-center" th:each="article : ${articles}">
+	                                    	<img th:src="@{/files/articleImage/{articleId}(articleId=${article.id})}" alt="" class="img-fluid me-2" style="width:50px; height:50px;">
+	                                    	<div class="articles-content">
+	                                    		<a th:href="@{/articles/article/{id}(id=${article.id})}"><h6 class="mb-0" th:text="${article.title}"></h6></a>
+	                                        	<small th:text="${timeUtils.formatRelativeTime(article.publicationDate)}"></small>
+	                                    	</div>
+	                                    	
+	                                    </div>
+                                    </div>
+             
+                                   <hr>
+                            <div class="button text-center">
+                            	<a href="/articles" class="text-danger">Show More</a>
+                            </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Article Section End -->
+					
+					<!-- Find Job Start -->
+					<div class="row mb-2">
+					    <div class="col-12">
+					        <!-- Find Job Start -->
+		                    <div class=" mb-2" data-wow-delay="0.1s">
+		                        <div class="bg-white shadow p-4" style="border-radius: 10px;">
+		                            <h5 class="mb-2">Find Your Dream Job Today</h5>
+		                            <small>Unlock your potential with JobHive. Browse thousands of job listings
+		                                tailored to your
+		                                skills and preferences. Join our community of professionals and take the next step in
+		                                your career journey.</small><br><br>
+		                                <hr>
+		                            <div class="button text-center">
+		                            	<a href="/jobs" class="btn text-danger">Browse Jobs</a>
+		                            </div>
+		                        </div>
+		                    </div>
+
+					    </div>
+					</div>
+		            <!-- Find Job End -->
+
+
+                </div>
+                <!-- Right Sidebar End -->
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main Section End  -->
+    </main>
+    <footer th:replace="~{layout :: page_footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: page_head}"></head>
+<style>
+@media (max-width: 400px) {
+    .notification-item .content small {
+        font-size: 12px;
+    }
+}
+.notification-item.bg-light {
+    background-color: #f8f9fa; /* Bootstrap light background color */
+}
+</style>
+<body>
+    <div th:replace="~{layout :: page_navbar}"></div>
+        <div class="container py-2 py-lg-4">
+            <div class="row g-lg-5 g-2">
+
+                <!-- Notification Content Start -->
+                <div class="col-lg-9 py-0">
+                    <div class="row pt-2 shadow bg-white mb-2" style="border-radius: 10px;">
+                        <div class="container p-3">
+                            <h4 class="mb-2">Notifications</h4>
+                            <!-- If no notifications, show message -->
+                            <div th:if="${#lists.isEmpty(notifications)}" class="text-center">
+                                <img src="/static/img/no-notification.png" class="img-fluid" alt="No Notifications"
+                                    width="200px">
+                                <p>No Notifications found</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row shadow bg-white mb-2 p-2" style="border-radius: 10px;"
+                        th:if="${!#lists.isEmpty(notifications)}">
+                        <div class="container">
+                            <div class="notification">
+                                <!-- Notification items will be generated here -->
+                                <div class="notification-item border-bottom" th:each="notification : ${notifications}"
+                                    th:attr="data-id=${notification.id}">
+                                    <div class="notification-content d-flex align-items-center justify-content-between mt-2 p-2"
+                                        th:classappend="${notification.isRead} ? '' : 'bg-light'">
+                                        <a href="#" class="text-muted"
+                                            th:onclick="'markNotificationAsRead(' + ${notification.id} + ', \'' + @{${notification.link}} + '\'); return false;'">
+                                            <div class="d-flex align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <!-- Replace with dynamic user image -->
+                                                    <img th:src="@{/files/notificationImage/{notificationId}(notificationId=${notification.id})}"
+                                                        class="img-fluid rounded-circle me-2"
+                                                        style="height:60px; width:60px;"
+                                                        onerror="this.src='/static/img/user.jpg';" />
+                                                    <div class="content ms-2">
+                                                        <!-- Conditional rendering based on HTML content flag -->
+                                                        <div th:if="${notification.isHtmlContent}">
+                                                            <small class="mb-2"
+                                                                th:utext="${notification.message}"></small>
+                                                        </div>
+                                                        <div th:unless="${notification.isHtmlContent}">
+                                                            <small class="mb-2"
+                                                                th:text="${notification.message}"></small>
+                                                        </div>
+                                                        <!-- Display formatted time here -->
+                                                        <p style="font-size:15px;"><small
+                                                                th:text="${notification.formattedTime}"></small></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="dropdown">
+                                            <a class="btn" href="#" role="button" data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                                <i class="fa fa-ellipsis-v px-2"></i>
+                                            </a>
+                                            <ul class="dropdown-menu shadow border-0">
+                                                <li>
+                                                    <a class="dropdown-item" th:href="@{${notification.link}}">
+                                                        <i class="fa fa-link"></i> View
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <!-- Form to mark notification as read -->
+                                                    <form
+                                                        th:action="@{/notifications/mark-as-read/{id}(id=${notification.id})}"
+                                                        method="post">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fa fa-check"></i> Mark as Read
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                                <li>
+                                                    <!-- Form to delete notification -->
+                                                    <form
+                                                        th:action="@{/notifications/delete/{id}(id=${notification.id})}"
+                                                        method="post">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fa fa-trash"></i> Delete Notification
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Notification Content End -->
+
+                <!-- Right Content Start -->
+                <div class="col-lg-3 py-0">
+                    <div class="row pt-2 wow slideInUp shadow bg-white mb-2" data-wow-delay="0.1s"
+                        style="border-radius: 10px;">
+                        <div class="container p-3">
+                            <h5>Manage your Notifications</h5>
+                            <a href="/notification-settings">View Settings</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Content End -->
+
+            </div>
+        </div>
+    <footer th:replace="~{layout :: page_footer}"></footer>
+
+    <script>
+    function markNotificationAsRead(id, link) {
+        fetch(`/notifications/mark-as-read/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ 'id': id })
+        }).then(response => {
+            if (response.ok) {
+                // Remove background color for the notification
+                const notificationElement = document.querySelector(`.notification-item[data-id="${id}"] .notification-content`);
+                if (notificationElement) {
+                    notificationElement.classList.remove('bg-light');
+                }
+                // Now we navigate to the link after marking as read
+                window.location.href = link;
+            } else {
+                console.error('Failed to mark notification as read');
+            }
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    </script>
+</body>
+</html>
